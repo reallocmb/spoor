@@ -1,0 +1,13 @@
+[x] UI -> SpoorObject zu Linked List, dass ich die Objekte sotieren kann.
+[ ] s_ui.c func zum sortieren von spoor_objects
+
+[ ] printf mit curser move
+
+
+
+
+
+
+[ ] Vielleicht eigene Datenbank als Datein Implementieren mit Ordner für datum -> mach ich nicht
+    dann geht es vielleicht leichter um zu sortieren.
+
