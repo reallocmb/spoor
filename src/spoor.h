@@ -7,8 +7,6 @@
 #include<X11/Xlib.h>
 #endif
 
-#include<windows.h>
-
 typedef struct Graphic {
     bool running;
     u16 width;
@@ -21,7 +19,6 @@ typedef struct Graphic {
     XImage *image;
     Window window;
     Display *display;
-#elif _WIN32
 #endif
 } Graphic;
 
