@@ -1,0 +1,144 @@
+#include"spoor.h" /* for lsp reason */
+
+#ifdef __unix__
+
+#include<X11/Xlib.h>
+
+#include<stdio.h>
+#include<stdlib.h>
+
+#define xlib_init graphic_init
+void xlib_init(Graphic *graphic)
+{
+    graphic->display = XOpenDisplay(NULL);
+    if (graphic->display == NULL)
+    {
+        /* todo(Mat) Logging? */
+        fprintf(stderr,
+                "error[FILE: %s, LINE: %d]: failed to Open Display()\n",
+                __FILE__, __LINE__);
+    }
+
+    graphic->window = XCreateWindow(graphic->display,
+                           DefaultRootWindow(graphic->display),
+                           0, 0,
+                           graphic->width, graphic->height,
+                           0,
+                           CopyFromParent,
+                           InputOutput,
+                           CopyFromParent,
+                           0,
+                           0);
+
+    Atom protocol_wm_delete_window = XInternAtom(graphic->display, "WM_DELETE_WINDOW", False);
+    XSetWMProtocols(graphic->display, graphic->window, &protocol_wm_delete_window, 1);
+
+    XSelectInput(graphic->display,
+                 graphic->window,
+                 StructureNotifyMask |
+                 ExposureMask |
+                 KeyPressMask |
+                 KeyReleaseMask);
+
+    XMapWindow(graphic->display, graphic->window);
+
+    graphic->image = XCreateImage(graphic->display,
+                                  DefaultVisual(graphic->display, 0),
+                                  24,
+                                  ZPixmap,
+                                  0,
+                                  NULL,
+                                  0,
+                                  0,
+                                  32, 
+                                  0);
+
+
+    graphic->render_func = render_default_func;
+}
+
+#define xlib_graphic_render graphic_render
+void xlib_graphic_render(Graphic *graphic)
+{
+    /* clear */
+    u32 i;
+    for (i = 0; i < graphic->pixels_count; i++)
+        graphic->pixels[i] = CONFIG_COLOR_BACKGROUND;
+    // graphic->pixels[10] = 0xffaaaa;
+
+    graphic->render_func(graphic);
+
+    XPutImage(graphic->display,
+              graphic->window,
+              DefaultGC(graphic->display, 0),
+              graphic->image,
+              0, 0,
+              0, 0,
+              graphic->width, graphic->height);
+}
+
+#define xlib_graphic_main_loop graphic_main_loop
+void xlib_graphic_main_loop(Graphic *graphic)
+{
+    XEvent event;
+    while (graphic->running)
+    {
+        XNextEvent(graphic->display, &event);
+        switch (event.type)
+        {
+            case Expose:
+            {
+                printf("Expose\n");
+                xlib_graphic_render(graphic);
+            } break;
+
+            case ConfigureNotify:
+            {
+                printf("ConfigureNotify\n");
+
+                graphic->width = event.xconfigure.width;
+                graphic->height = event.xconfigure.height;
+                printf("Width: %d Height %d\n",
+                       graphic->width,
+                       graphic->height);
+
+
+                if (graphic->pixels)
+                    free(graphic->pixels);
+
+                graphic->pixels_count = graphic->width * graphic->height;
+                graphic->pixels = malloc(graphic->pixels_count * sizeof(*graphic->pixels));
+
+                graphic->image->width = graphic->width;
+                graphic->image->height = graphic->height;
+                graphic->image->bytes_per_line = graphic->width * sizeof(*graphic->pixels);
+                graphic->image->data = (char *)graphic->pixels;
+            } break;
+
+            case KeyPress:
+            {
+                printf("KeyPress\n");
+            } break;
+
+            case KeyRelease:
+            {
+                printf("KeyReleased\n");
+            } break;
+
+            case ClientMessage:
+            {
+                printf("ClientMessage WM_DELETE_WINDOW\n");
+
+                graphic->running = false;
+            } break;
+
+            default:
+            {
+                printf("Event Type: %d\n",
+                       event.type);
+            } break;
+        }
+    }
+}
+
+#endif

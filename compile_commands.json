@@ -1,0 +1,27 @@
+[
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-c",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-pedantic",
+      "-pedantic-errors",
+      "-Iinc",
+      "-I/usr/include/freetype2",
+      "-I/usr/include/libpng16",
+      "-I/usr/include/harfbuzz",
+      "-I/usr/include/glib-2.0",
+      "-I/usr/lib/glib-2.0/include",
+      "-I/usr/include/sysprof-6",
+      "-pthread",
+      "-o",
+      "./bin/spoor",
+      "src/spoor_main.c"
+    ],
+    "directory": "/home/mb/ws/c/spoor",
+    "file": "/home/mb/ws/c/spoor/src/spoor_main.c",
+    "output": "/home/mb/ws/c/spoor/bin/spoor"
+  }
+]
