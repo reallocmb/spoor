@@ -7,6 +7,15 @@
 #include<X11/Xlib.h>
 #endif
 
+#include<ft2build.h>
+#include FT_FREETYPE_H
+
+typedef struct Font {
+    FT_Library library;
+    FT_Face face;
+    u16 size;
+} Font;
+
 typedef struct Graphic {
     bool running;
     u16 width;
@@ -24,6 +33,7 @@ typedef struct Graphic {
 
 typedef struct Spoor {
     Graphic graphic;
+    Font font;
 } Spoor;
 
 #endif

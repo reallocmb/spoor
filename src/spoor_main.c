@@ -1,5 +1,6 @@
 #include"s_types.h"
 #include"spoor.h"
+#include"s_font.c"
 #include"s_render.c"
 #include"s_xlib.c"
 #include"s_win32.c"
@@ -12,8 +13,8 @@ int main(void)
 {
     Spoor spoor = { 0 };
     spoor.graphic.running = true;
-    spoor.graphic.width = 600;
-    spoor.graphic.height = 400;
+    spoor.graphic.width = 800;
+    spoor.graphic.height = 600;
     spoor.graphic.pixels = NULL;
 
     CONFIG_COLOR_BACKGROUND_SET(0xff883388);
