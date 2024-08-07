@@ -14,6 +14,8 @@ typedef struct Font {
     FT_Library library;
     FT_Face face;
     u16 size;
+    u16 dpi_x;
+    u16 dpi_y;
 } Font;
 
 typedef struct Graphic {
@@ -29,11 +31,12 @@ typedef struct Graphic {
     Window window;
     Display *display;
 #endif
+    Font font;
+    u8 mode;
 } Graphic;
 
 typedef struct Spoor {
     Graphic graphic;
-    Font font;
 } Spoor;
 
 #endif

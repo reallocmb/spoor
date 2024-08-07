@@ -1,5 +1,4 @@
 #include"spoor.h" /* for lsp reason */
-#include <wchar.h>
 
 u32 color_alpha_blend(u32 color0, u32 color1, u32 alpha)
 {
@@ -76,7 +75,7 @@ void render_rectangle_fill(Graphic *graphic,
         for (i = 0; i < width; i++)
         {
             pixels_position = (y + height) * graphic->width + x + i;
-            graphic->pixels[pixels_position] = color_alpha_blend(color,
+            graphic->pixels[pixels_position] = color_alpha_blend(color & 0xffffff,
                                                                  graphic->pixels[pixels_position],
                                                                  color >> 24);
         }
@@ -97,62 +96,54 @@ void render_rectangle(Graphic *graphic,
 
 #include<windows.h>
 
+void render_label(Graphic *graphic,
+                  u16 x,
+                  u16 y,
+                  u16 height,
+                  u16 padding_top_bottom,
+                  const u16 *text,
+                  u32 color)
+{
+    u16 h = height - padding_top_bottom * 2;
+}
+
+
 void render_text(Graphic *graphic,
                  u16 x,
                  u16 y,
                  const u16 *text,
                  u32 color)
 {
-    FT_Library library;
-    FT_Face face;
+    FT_GlyphSlot slot = graphic->font.face->glyph;
+    int pen_x, pen_y, i;
 
-    FT_Init_FreeType(&library);
-#if 0
-    FT_New_Face(library, "../data/FiraCode-Regular.ttf", 0, &face);
-#else
-    FT_New_Face(library, "../data/FreeMono.ttf", 0, &face);
-#endif
+    int height = (graphic->font.face->height >> 6);
+    height = (graphic->font.face->ascender >> 6) - (graphic->font.face->descender >> 6);
+    height = (graphic->font.face->size->metrics.height >> 6);
+    height = (graphic->font.face->size->metrics.ascender >> 6) - (graphic->font.face->size->metrics.descender >> 6);
+    printf("height: %d\n", height);
+    render_rectangle(graphic, x, y - height - (graphic->font.face->size->metrics.descender >> 6), 100, height, 0xffaa2266);
 
-
-    HDC device_context = GetDC(NULL);
-    u32 dpi_x = GetDeviceCaps(device_context, LOGPIXELSX);
-    u32 dpi_y = GetDeviceCaps(device_context, LOGPIXELSY);
-    printf("dpi: %d-%d\n", dpi_x, dpi_y);
-    printf("glyphs_num: %d\n", face->num_glyphs);
-
-#if 1
-    FT_Set_Char_Size(face, 0, 30 * 64, dpi_x, dpi_y);
-#else
-    FT_Set_Pixel_Sizes(face, 0, 10);
-#endif
-
-
-    FT_GlyphSlot slot = face->glyph;
-    int pen_x, pen_y, n;
+    /*
+    render_line_horizontal(graphic, x, y - (graphic->font.face->bbox.yMin >> 6), 300, 0xff00ff00);
+    render_line_horizontal(graphic, x, y - height, 300, 0xff00ff00);
+    */
 
     pen_x = x;
     pen_y = y;
 
-    render_line_horizontal(graphic, pen_x - 2, pen_y, 5, 0xff0000aa);
-    render_line_vertical(graphic, pen_x, pen_y - 2, 5, 0xff0000aa);
-    graphic->pixels[pen_y * graphic->width + pen_x] = 0xffff0000;
-
-#if 1
-    render_line_horizontal(graphic, pen_x, pen_y, graphic->width - pen_x, 0xff00ff00);
-#endif
-
-    for (n = 0; n < wcslen(text); n++)
+    for (i = 0; i < text[i] != 0; i++)
     {
+        FT_ULong glyph_index = FT_Get_Char_Index(graphic->font.face, text[i]);
 
-        FT_ULong glyph_index = FT_Get_Char_Index(face, text[n]);
-        printf("glyph_index: %d\n", glyph_index);
+        FT_Load_Glyph(graphic->font.face, glyph_index, FT_LOAD_DEFAULT);
 
-        FT_Load_Glyph(face, glyph_index, FT_LOAD_DEFAULT);
+        FT_Render_Glyph(graphic->font.face->glyph, FT_RENDER_MODE_NORMAL);
 
-            FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL);
+        /* todo(mb) read the freetype tutorial*/
 
         int x = pen_x + slot->bitmap_left;
-        int y = pen_y - slot->bitmap_top;;
+        int y = pen_y - slot->bitmap_top;
 
         int rows;
         int cols;
@@ -162,21 +153,19 @@ void render_text(Graphic *graphic,
             for (cols = 0; cols < slot->bitmap.pitch; cols++)
             {
                 u32 bitmap_alpha = slot->bitmap.buffer[rows * slot->bitmap.pitch + cols];
-                graphic->pixels[(y + rows) * graphic->width + (x + cols)] = color_alpha_blend(color, graphic->pixels[(y + rows) * graphic->width + (x + cols)], bitmap_alpha);
-                // graphic->pixels[(y + rows) * graphic->width + (x + cols)] = 0xffff0000;
+                u32 pixels_count = (y + rows) * graphic->width + (x + cols);
+                graphic->pixels[pixels_count] = color_alpha_blend(color,
+                                                                  graphic->pixels[pixels_count],
+                                                                  bitmap_alpha);
             }
         }
-
         pen_x += slot->advance.x >> 6;
     }
-
-
-    FT_Done_FreeType(library);
 }
 
 void render_default_func(Graphic *graphic)
 {
-#if 0
+#if 1
     render_line_horizontal(graphic, 50, 50, 100, 0xffffffff);
     render_line_vertical(graphic, 100, 0, 100, 0xffffffff);
     render_rectangle_fill(graphic, 100, 100, 60, 40, 0x33ffffff);

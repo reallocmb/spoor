@@ -2,14 +2,35 @@
 #define S_CONFIG_H
 
 enum {
-    COLOR_BACKGROUND,
+    SPOOR_COLOR_BACKGROUND,
+    SPOOR_COLOR_STATUS_BAR_BACKGROUND = 1,
+    SPOOR_COLOR_STATUS_BAR_FOREGROUND,
 };
 
-#define CONFIG_COLOR_BACKGROUND config_colors[COLOR_BACKGROUND]
-#define CONFIG_COLOR_BACKGROUND_SET(color) config_colors[COLOR_BACKGROUND] = color
+#define CONFIG_COLOR_BACKGROUND config_colors[SPOOR_COLOR_BACKGROUND]
+#define CONFIG_COLOR_BACKGROUND_SET(color) config_colors[SPOOR_COLOR_BACKGROUND] = color
+
+#define CONFIG_COLOR_STATUS_BAR_BACKGROUND config_colors[SPOOR_COLOR_STATUS_BAR_BACKGROUND]
+#define CONFIG_COLOR_STATUS_BAR_BACKGROUND_SET(color) config_colors[COLOR_STATUS_BAR_BACKGROUND] = color
+
+#define CONFIG_COLOR_STATUS_BAR_FOREGROUND config_colors[SPOOR_COLOR_STATUS_BAR_FOREGROUND]
+#define CONFIG_COLOR_STATUS_BAR_FOREGROUND_SET(color) config_colors[SPOOR_COLOR_STATUS_BAR_FOREGROUND] = color
 
 u32 config_colors[] = {
     0xff0c0c0c,
+    0x220c0c0c,
+    0x220c0c0c,
+};
+
+enum {
+    SPOOR_GRAPHIC_SCALE,
+};
+
+#define CONFIG_GRAPHIC_SCALE config_graphic[SPOOR_GRAPHIC_SCALE]
+#define CONFIG_GRAPHIC_SCALE_SET(scale) config_graphic[SPOOR_GRAPHIC_SCALE] = scale;
+
+float config_graphic[] = {
+    1,
 };
 
 #endif
