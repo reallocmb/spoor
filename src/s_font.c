@@ -12,4 +12,6 @@ void font_load(Font *font, const char *path, u32 size)
     FT_New_Face(font->library, path, 0, &font->face);
 
     font_size_set(font, size);
+
+    font->height = (font->face->size->metrics.height >> 6);
 }

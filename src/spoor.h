@@ -16,6 +16,7 @@ typedef struct Font {
     u16 size;
     u16 dpi_x;
     u16 dpi_y;
+    u16 height;
 } Font;
 
 typedef struct Graphic {
@@ -25,7 +26,7 @@ typedef struct Graphic {
     u32 *pixels;
     u32 pixels_count;
     void (*render_func)(struct Graphic *graphic);
-    void (*input_func)(struct Graphic *graphic);
+    void (*input_func)(struct Graphic *graphic, u8 key);
 #ifdef __unix__
     XImage *image;
     Window window;

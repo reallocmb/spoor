@@ -96,6 +96,7 @@ void render_rectangle(Graphic *graphic,
 
 #include<windows.h>
 
+#if 0 /* todo(mb) remove? */
 void render_label(Graphic *graphic,
                   u16 x,
                   u16 y,
@@ -106,6 +107,7 @@ void render_label(Graphic *graphic,
 {
     u16 h = height - padding_top_bottom * 2;
 }
+#endif
 
 
 void render_text(Graphic *graphic,
@@ -115,19 +117,10 @@ void render_text(Graphic *graphic,
                  u32 color)
 {
     FT_GlyphSlot slot = graphic->font.face->glyph;
-    int pen_x, pen_y, i;
+    u16 pen_x, pen_y, i;
 
-    int height = (graphic->font.face->height >> 6);
-    height = (graphic->font.face->ascender >> 6) - (graphic->font.face->descender >> 6);
-    height = (graphic->font.face->size->metrics.height >> 6);
-    height = (graphic->font.face->size->metrics.ascender >> 6) - (graphic->font.face->size->metrics.descender >> 6);
-    printf("height: %d\n", height);
-    render_rectangle(graphic, x, y - height - (graphic->font.face->size->metrics.descender >> 6), 100, height, 0xffaa2266);
-
-    /*
-    render_line_horizontal(graphic, x, y - (graphic->font.face->bbox.yMin >> 6), 300, 0xff00ff00);
-    render_line_horizontal(graphic, x, y - height, 300, 0xff00ff00);
-    */
+    u16 height = (graphic->font.face->size->metrics.ascender >> 6) - (graphic->font.face->size->metrics.descender >> 6);
+    //render_rectangle(graphic, x, y - height - (graphic->font.face->size->metrics.descender >> 6), 100, height, 0xffaa2266); /* todo remove? */
 
     pen_x = x;
     pen_y = y;

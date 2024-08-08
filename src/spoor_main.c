@@ -2,6 +2,7 @@
 #include"spoor.h"
 #include"s_font.c"
 #include"s_render.c"
+#include"s_status_bar.c"
 #include"s_xlib.c"
 #include"s_win32.c"
 
@@ -9,17 +10,21 @@
 
 void status_bar_render(Graphic *graphic)
 {
-    u16 height = STATUS_BAR_HEIGHT;
+    u16 height = CONFIG_STATUS_BAR_HEIGHT;
     u16 y = graphic->height - height;
 
     render_rectangle_fill(graphic, 0, y, graphic->width, height, CONFIG_COLOR_STATUS_BAR_BACKGROUND);
-    render_text(graphic, 10, graphic->height - 50, L"statusCommandgolijen", CONFIG_COLOR_STATUS_BAR_FOREGROUND);
+    render_text(graphic, 10, graphic->height + (graphic->font.face->size->metrics.descender >> 6) - CONFIG_STATUS_BAR_PADDING, L"statusCommandgolijen", CONFIG_COLOR_STATUS_BAR_FOREGROUND);
     // render_label(graphic, 10, graphic->height, height, 5, L"STATUS BAR TESTg", CONFIG_COLOR_STATUS_BAR_FOREGROUND);
 }
 
 void render_func(Graphic *graphic)
 {
     status_bar_render(graphic);
+}
+
+void input_func(Graphic *graphic, u8 key)
+{
 }
 
 int main(void)
@@ -30,11 +35,13 @@ int main(void)
     spoor.graphic.height = 600;
     spoor.graphic.pixels = NULL;
     spoor.graphic.render_func = render_func;
-    
-    CONFIG_COLOR_BACKGROUND_SET(0xff883388);
-    
+    spoor.graphic.input_func = input_func;
+
+    //CONFIG_COLOR_BACKGROUND_SET(0xff883388);
+    //CONFIG_GRAPHIC_SCALE_SET(2.1);
+
     font_load(&spoor.graphic.font, "../data/FreeMono.ttf", 30);
-    
+    status_bar_init(&spoor.graphic);
     graphic_init(&spoor.graphic);
     graphic_main_loop(&spoor.graphic);
     
