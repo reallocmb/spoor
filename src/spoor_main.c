@@ -17,7 +17,7 @@ void status_bar_render(Graphic *graphic)
     render_text(graphic,
                 10,
                 graphic->height + (graphic->font.face->size->metrics.descender >> 6) - CONFIG_STATUS_BAR_PADDING,
-                (u32 *)L"statusCommandgolijen",
+                L"statusCommandgolijeöden",
                 CONFIG_COLOR_STATUS_BAR_FOREGROUND);
     // render_label(graphic, 10, graphic->height, height, 5, L"STATUS BAR TESTg", CONFIG_COLOR_STATUS_BAR_FOREGROUND);
 }

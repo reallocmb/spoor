@@ -65,6 +65,11 @@ LRESULT main_wndproc(HWND window,
             
             EndPaint(window, &paint);
         } break;
+
+        case WM_KEYDOWN:
+        {
+            global_graphic->input_func(global_graphic, (u8) w_param);
+        } break;
         
         case WM_DESTROY:
         {

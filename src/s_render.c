@@ -1,4 +1,5 @@
 #include"spoor.h" /* for lsp reason */
+#include<wchar.h>
 
 u32 color_alpha_blend(u32 color0, u32 color1, u32 alpha)
 {
@@ -111,7 +112,7 @@ void render_label(Graphic *graphic,
 void render_text(Graphic *graphic,
                  u16 x,
                  u16 y,
-                 const u32 *text,
+                 const wchar_t *text,
                  u32 color)
 {
     FT_GlyphSlot slot = graphic->font.face->glyph;
@@ -166,7 +167,7 @@ void render_default_func(Graphic *graphic)
     render_rectangle_fill(graphic, graphic->width / 4, graphic->height / 4, graphic->width / 2, graphic->height / 2, 0x44aaff22);
     render_rectangle(graphic, graphic->width / 4, graphic->height / 4, graphic->width / 2, graphic->height / 2, 0xcc0c0c0c);
 #endif
-#if 1
+#if 0
     u32 *buffer = (u32 *)L"Das ist Öde";
     render_text(graphic, 200, 200, (u32 *)buffer, 0x33eeeeee);
 #endif
