@@ -17,7 +17,7 @@ void status_bar_render(Graphic *graphic)
     render_text(graphic,
                 10,
                 graphic->height + (graphic->font.face->size->metrics.descender >> 6) - CONFIG_STATUS_BAR_PADDING,
-                L"statusCommandgolijeöden",
+                (const wchar_t *)graphic->command_buffer.buffer,
                 CONFIG_COLOR_STATUS_BAR_FOREGROUND);
     // render_label(graphic, 10, graphic->height, height, 5, L"STATUS BAR TESTg", CONFIG_COLOR_STATUS_BAR_FOREGROUND);
 }
@@ -29,6 +29,14 @@ void render_func(Graphic *graphic)
 
 void input_func(Graphic *graphic, u8 key)
 {
+    printf("char %c\n", key);
+    switch (key)
+    {
+        case 'q':
+        {
+            exit(0);
+        } break;
+    }
     printf("Key Pressed: %d\n", key);
 }
 

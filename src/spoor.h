@@ -19,6 +19,13 @@ typedef struct SpoorFont {
     u16 height;
 } SpoorFont;
 
+#define COMMAND_BUFFER_ALLOC 250
+
+typedef struct CommandBuffer {
+    char *buffer;
+    u32 buffer_count;
+} CommandBuffer;
+
 typedef struct Graphic {
     bool running;
     u16 width;
@@ -27,6 +34,7 @@ typedef struct Graphic {
     u32 pixels_count;
     void (*render_func)(struct Graphic *graphic);
     void (*input_func)(struct Graphic *graphic, u8 key);
+    CommandBuffer command_buffer;
 #ifdef __unix__
     XImage *image;
     Window window;

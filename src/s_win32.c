@@ -66,9 +66,19 @@ LRESULT main_wndproc(HWND window,
             EndPaint(window, &paint);
         } break;
 
+        case WM_CHAR:
+        {
+            printf("wm_char: %c\n", (char)w_param);
+            global_graphic->input_func(global_graphic, (u8) w_param);
+        } break;
+
+        case WM_SYSKEYDOWN:
+        {
+            printf("syskeydown: %lld\n", w_param);
+        } break;
+
         case WM_KEYDOWN:
         {
-            global_graphic->input_func(global_graphic, (u8) w_param);
         } break;
         
         case WM_DESTROY:
@@ -136,6 +146,10 @@ void win32_init(Graphic *graphic)
 
     if (graphic->render_func == NULL)
         graphic->render_func = render_default_func;
+
+    graphic->command_buffer.buffer = malloc(COMMAND_BUFFER_ALLOC * sizeof(graphic->command_buffer.buffer));
+    graphic->command_buffer.buffer[0] = 0;
+    graphic->command_buffer.buffer_count = 0;
 }
 
 #define win32_main_loop graphic_main_loop
