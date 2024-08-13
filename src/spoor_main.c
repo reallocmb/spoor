@@ -14,7 +14,11 @@ void status_bar_render(Graphic *graphic)
     u16 y = graphic->height - height;
 
     render_rectangle_fill(graphic, 0, y, graphic->width, height, CONFIG_COLOR_STATUS_BAR_BACKGROUND);
-    render_text(graphic, 10, graphic->height + (graphic->font.face->size->metrics.descender >> 6) - CONFIG_STATUS_BAR_PADDING, L"statusCommandgolijen", CONFIG_COLOR_STATUS_BAR_FOREGROUND);
+    render_text(graphic,
+                10,
+                graphic->height + (graphic->font.face->size->metrics.descender >> 6) - CONFIG_STATUS_BAR_PADDING,
+                (u32 *)L"statusCommandgolijen",
+                CONFIG_COLOR_STATUS_BAR_FOREGROUND);
     // render_label(graphic, 10, graphic->height, height, 5, L"STATUS BAR TESTg", CONFIG_COLOR_STATUS_BAR_FOREGROUND);
 }
 
@@ -25,6 +29,7 @@ void render_func(Graphic *graphic)
 
 void input_func(Graphic *graphic, u8 key)
 {
+    printf("Key Pressed: %d\n", key);
 }
 
 int main(void)
@@ -40,7 +45,7 @@ int main(void)
     //CONFIG_COLOR_BACKGROUND_SET(0xff883388);
     //CONFIG_GRAPHIC_SCALE_SET(2.1);
 
-    font_load(&spoor.graphic.font, "../data/FreeMono.ttf", 30);
+    font_load(&spoor.graphic.font, "data/FreeMono.ttf", 30);
     status_bar_init(&spoor.graphic);
     graphic_init(&spoor.graphic);
     graphic_main_loop(&spoor.graphic);

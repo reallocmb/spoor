@@ -54,7 +54,28 @@ void xlib_init(Graphic *graphic)
                                   0);
 
 
-    graphic->render_func = render_default_func;
+#if 0
+    char *str = XSetLocaleModifiers("");
+    printf("locale return: %s\n", str);
+#endif
+
+    XIM xim = XOpenIM(graphic->display,
+                      NULL,
+                      NULL,
+                      NULL);
+    if (xim == NULL)
+    {
+        fprintf(stderr, "FILE: %s, LINE: %d -> XOpenIM() failed\n", __FILE__, __LINE__);
+        return;
+    }
+
+    graphic->input_context = XCreateIC(xim,
+                                       XNInputStyle,
+                                       XIMPreeditNothing | XIMStatusNothing,
+                                       NULL);
+
+    if (graphic->render_func == NULL)
+        graphic->render_func = render_default_func;
 }
 
 #define xlib_graphic_render graphic_render
@@ -102,7 +123,6 @@ void xlib_graphic_main_loop(Graphic *graphic)
                        graphic->width,
                        graphic->height);
 
-
                 if (graphic->pixels)
                     free(graphic->pixels);
 
@@ -117,7 +137,35 @@ void xlib_graphic_main_loop(Graphic *graphic)
 
             case KeyPress:
             {
+                char buffer[255];
+                wchar_t wbuffer[255];
+                KeySym key;
                 printf("KeyPress\n");
+                Status status;
+                int buffer_bytes = XmbLookupString(graphic->input_context,
+                                                   &event.xkey,
+                                                   buffer,
+                                                   255,
+                                                   &key,
+                                                   &status);
+                int wbuffer_bytes = XwcLookupString(graphic->input_context,
+                                                    &event.xkey,
+                                                    wbuffer,
+                                                    255,
+                                                    &key,
+                                                    &status);
+                printf("buffer: %s\n", buffer);
+                printf("keysym: %ld\n", key);
+                printf("keysym string: %s\n", XKeysymToString(key));
+                printf("bytes: %d\n", buffer_bytes);
+                puts("---");
+                printf("wbuffer: %s\n", "öde");
+                printf("keysym: %ld\n", key);
+                printf("keysym string: %s\n", XKeysymToString(key));
+                printf("bytes: %d\n", wbuffer_bytes);
+
+
+                graphic->input_func(graphic, buffer[0]);
             } break;
 
             case KeyRelease:

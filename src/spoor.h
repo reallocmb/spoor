@@ -10,14 +10,14 @@
 #include<ft2build.h>
 #include FT_FREETYPE_H
 
-typedef struct Font {
+typedef struct SpoorFont {
     FT_Library library;
     FT_Face face;
     u16 size;
     u16 dpi_x;
     u16 dpi_y;
     u16 height;
-} Font;
+} SpoorFont;
 
 typedef struct Graphic {
     bool running;
@@ -31,8 +31,9 @@ typedef struct Graphic {
     XImage *image;
     Window window;
     Display *display;
+    XIC input_context;
 #endif
-    Font font;
+    SpoorFont font;
     u8 mode;
 } Graphic;
 

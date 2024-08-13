@@ -94,8 +94,6 @@ void render_rectangle(Graphic *graphic,
     render_line_vertical(graphic, x + width - 1, y, height, color);
 }
 
-#include<windows.h>
-
 #if 0 /* todo(mb) remove? */
 void render_label(Graphic *graphic,
                   u16 x,
@@ -113,19 +111,21 @@ void render_label(Graphic *graphic,
 void render_text(Graphic *graphic,
                  u16 x,
                  u16 y,
-                 const u16 *text,
+                 const u32 *text,
                  u32 color)
 {
     FT_GlyphSlot slot = graphic->font.face->glyph;
     u16 pen_x, pen_y, i;
 
+#if 0 /* todo(mb) remove ? */
     u16 height = (graphic->font.face->size->metrics.ascender >> 6) - (graphic->font.face->size->metrics.descender >> 6);
-    //render_rectangle(graphic, x, y - height - (graphic->font.face->size->metrics.descender >> 6), 100, height, 0xffaa2266); /* todo remove? */
+    render_rectangle(graphic, x, y - height - (graphic->font.face->size->metrics.descender >> 6), 100, height, 0xffaa2266); /* todo remove? */
+#endif
 
     pen_x = x;
     pen_y = y;
 
-    for (i = 0; i < text[i] != 0; i++)
+    for (i = 0; i < text[i]; i++)
     {
         FT_ULong glyph_index = FT_Get_Char_Index(graphic->font.face, text[i]);
 
@@ -135,11 +135,11 @@ void render_text(Graphic *graphic,
 
         /* todo(mb) read the freetype tutorial*/
 
-        int x = pen_x + slot->bitmap_left;
-        int y = pen_y - slot->bitmap_top;
+        u16 x = pen_x + slot->bitmap_left;
+        u16 y = pen_y - slot->bitmap_top;
 
-        int rows;
-        int cols;
+        u16 rows;
+        u16 cols;
 
         for (rows = 0; rows < slot->bitmap.rows; rows++)
         {
@@ -166,6 +166,8 @@ void render_default_func(Graphic *graphic)
     render_rectangle_fill(graphic, graphic->width / 4, graphic->height / 4, graphic->width / 2, graphic->height / 2, 0x44aaff22);
     render_rectangle(graphic, graphic->width / 4, graphic->height / 4, graphic->width / 2, graphic->height / 2, 0xcc0c0c0c);
 #endif
-    u16 buffer[] = L"Das ist Öde";
-    render_text(graphic, 200, 200, buffer, 0x33eeeeee);
+#if 1
+    u32 *buffer = (u32 *)L"Das ist Öde";
+    render_text(graphic, 200, 200, (u32 *)buffer, 0x33eeeeee);
+#endif
 }
