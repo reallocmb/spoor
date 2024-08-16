@@ -7,6 +7,26 @@
 #include<stdio.h>
 #include<stdlib.h>
 
+#define xlib_graphic_update graphic_update
+void xlib_graphic_update(Graphic *graphic)
+{
+    /* clear */
+    u32 i;
+    for (i = 0; i < graphic->pixels_count; i++)
+        graphic->pixels[i] = CONFIG_COLOR_BACKGROUND;
+    // graphic->pixels[10] = 0xffaaaa;
+
+    graphic->render_func(graphic);
+
+    XPutImage(graphic->display,
+              graphic->window,
+              DefaultGC(graphic->display, 0),
+              graphic->image,
+              0, 0,
+              0, 0,
+              graphic->width, graphic->height);
+}
+
 #define xlib_init graphic_init
 void xlib_init(Graphic *graphic)
 {
@@ -76,27 +96,15 @@ void xlib_init(Graphic *graphic)
 
     if (graphic->render_func == NULL)
         graphic->render_func = render_default_func;
+
+    graphic->command_buffer.buffer = malloc(COMMAND_BUFFER_ALLOC * sizeof(graphic->command_buffer.buffer));
+    graphic->command_buffer.buffer[0] = 0;
+    graphic->command_buffer.count = 0;
+    memcpy(graphic->command_buffer.buffer,
+           L"NORMAL",
+           7 * sizeof(*graphic->command_buffer.buffer));
 }
 
-#define xlib_graphic_render graphic_render
-void xlib_graphic_render(Graphic *graphic)
-{
-    /* clear */
-    u32 i;
-    for (i = 0; i < graphic->pixels_count; i++)
-        graphic->pixels[i] = CONFIG_COLOR_BACKGROUND;
-    // graphic->pixels[10] = 0xffaaaa;
-
-    graphic->render_func(graphic);
-
-    XPutImage(graphic->display,
-              graphic->window,
-              DefaultGC(graphic->display, 0),
-              graphic->image,
-              0, 0,
-              0, 0,
-              graphic->width, graphic->height);
-}
 
 #define xlib_graphic_main_loop graphic_main_loop
 void xlib_graphic_main_loop(Graphic *graphic)
@@ -110,7 +118,7 @@ void xlib_graphic_main_loop(Graphic *graphic)
             case Expose:
             {
                 printf("Expose\n");
-                xlib_graphic_render(graphic);
+                xlib_graphic_update(graphic);
             } break;
 
             case ConfigureNotify:

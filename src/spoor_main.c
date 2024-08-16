@@ -3,6 +3,7 @@
 #include"s_font.c"
 #include"s_render.c"
 #include"s_status_bar.c"
+#include"s_command_buffer.c"
 #include"s_xlib.c"
 #include"s_win32.c"
 
@@ -29,21 +30,42 @@ void render_func(Graphic *graphic)
 void input_func(Graphic *graphic, u8 key)
 {
     printf("char %c\n", key);
-    switch (key)
+    if (graphic->mode == GRAPHIC_MODE_NORMAL)
     {
-        case 'q':
+        switch (key)
         {
-            exit(0);
-        } break;
-
-        case ':':
-        {
-            graphic->mode = GRAPHIC_MODE_COMMAND_BUFFER;
-            graphic->command_buffer.buffer[0] = ':';
-            graphic->command_buffer.buffer[1] = 0;
-            graphic->command_buffer.buffer_count = 1;
-        } break;
+            case ':':
+            {
+                graphic->mode = GRAPHIC_MODE_COMMAND_BUFFER;
+                graphic->command_buffer.buffer[0] = ':';
+                graphic->command_buffer.buffer[1] = 0;
+                graphic->command_buffer.count = 1;
+            } break;
+        }
     }
+    else if (graphic->mode == GRAPHIC_MODE_COMMAND_BUFFER)
+    {
+        switch (key)
+        {
+            case SPOOR_INPUT_ASCII_KEY_RETURN: 
+            {
+                graphic->mode = GRAPHIC_MODE_NORMAL;
+                command_buffer_execute(&graphic->command_buffer);
+            } break;
+
+            case SPOOR_INPUT_ASCII_KEY_BACKSPACE:
+            {
+                graphic->command_buffer.buffer[--graphic->command_buffer.count] = 0;
+            } break;
+
+            default:
+            {
+                graphic->command_buffer.buffer[graphic->command_buffer.count++] = key;
+                graphic->command_buffer.buffer[graphic->command_buffer.count] = 0;
+            } break;
+        }
+    }
+
     printf("Key Pressed: %d\n", key);
 
     graphic_update(graphic);
@@ -62,7 +84,8 @@ int main(void)
     //CONFIG_COLOR_BACKGROUND_SET(0xff883388);
     //CONFIG_GRAPHIC_SCALE_SET(2.1);
 
-    font_load(&spoor.graphic.font, "data/FreeMono.ttf", 25);
+    //font_load(&spoor.graphic.font, "data/FreeMono.ttf", 25);
+    font_load(&spoor.graphic.font, "data/Essays1743.ttf", 40);
     status_bar_init(&spoor.graphic);
     graphic_init(&spoor.graphic);
     graphic_main_loop(&spoor.graphic);

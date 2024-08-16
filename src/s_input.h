@@ -1,0 +1,7 @@
+#ifndef S_INPUT_H
+#define S_INPUT_H
+
+#define SPOOR_INPUT_ASCII_KEY_RETURN 0x0d
+#define SPOOR_INPUT_ASCII_KEY_BACKSPACE 0x08
+
+#endif

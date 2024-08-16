@@ -2,6 +2,7 @@
 #define SPOOR_H
 
 #include"s_config.h"
+#include"s_input.h"
 
 #ifdef __unix__
 #include<X11/Xlib.h>
@@ -25,12 +26,12 @@ typedef struct SpoorFont {
 
 typedef struct CommandBuffer {
     wchar_t *buffer;
-    u32 buffer_count;
+    u32 count;
 } CommandBuffer;
 
 enum {
-    GRAPHIC_MODE_COMMAND_BUFFER,
     GRAPHIC_MODE_NORMAL,
+    GRAPHIC_MODE_COMMAND_BUFFER,
 };
 
 typedef struct Graphic {
@@ -47,7 +48,7 @@ typedef struct Graphic {
     Window window;
     Display *display;
     XIC input_context;
-#else _WIN32
+#elif _WIN32
     HDC device_context;
 #endif
     SpoorFont font;
