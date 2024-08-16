@@ -41,6 +41,9 @@ void input_func(Graphic *graphic, u8 key)
                 graphic->command_buffer.buffer[1] = 0;
                 graphic->command_buffer.count = 1;
             } break;
+
+            case SPOOR_INPUT_ASCII_KEY_CONTROL_S: printf("vertical split...\n"); break;
+            case SPOOR_INPUT_ASCII_KEY_CONTROL_H: printf("horizontal split...\n"); break;
         }
     }
     else if (graphic->mode == GRAPHIC_MODE_COMMAND_BUFFER)

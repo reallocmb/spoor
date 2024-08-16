@@ -2,6 +2,7 @@
 #define SPOOR_H
 
 #include"s_config.h"
+// #include"s_commands.h" /* todo(mb) */
 #include"s_input.h"
 
 #ifdef __unix__

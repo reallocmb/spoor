@@ -1,5 +1,10 @@
 void command_buffer_execute(CommandBuffer *command_buffer)
 {
+
+    if (memcmp(command_buffer->buffer, L":open", 5 * sizeof(*command_buffer->buffer)) == 0)
+    {
+    }
+
     if (command_buffer->count == 2)
     {
         if (memcmp(command_buffer->buffer, L":q", 2 * sizeof(*command_buffer->buffer)) == 0)

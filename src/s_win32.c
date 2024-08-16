@@ -172,9 +172,9 @@ void win32_init(Graphic *graphic)
 
     graphic->command_buffer.buffer = malloc(COMMAND_BUFFER_ALLOC * sizeof(graphic->command_buffer.buffer));
     graphic->command_buffer.buffer[0] = 0;
-    graphic->command_buffer.buffer_count = 0;
+    graphic->command_buffer.count = 0;
     memcpy(graphic->command_buffer.buffer,
-           L"Status Bargest",
+           L"NORMAL",
            11 * sizeof(*graphic->command_buffer.buffer));
 }
 
