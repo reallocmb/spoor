@@ -5,6 +5,8 @@
 
 #ifdef __unix__
 #include<X11/Xlib.h>
+#elif _WIN32
+#include<windows.h>
 #endif
 
 #include<ft2build.h>
@@ -22,9 +24,14 @@ typedef struct SpoorFont {
 #define COMMAND_BUFFER_ALLOC 250
 
 typedef struct CommandBuffer {
-    char *buffer;
+    wchar_t *buffer;
     u32 buffer_count;
 } CommandBuffer;
+
+enum {
+    GRAPHIC_MODE_COMMAND_BUFFER,
+    GRAPHIC_MODE_NORMAL,
+};
 
 typedef struct Graphic {
     bool running;
@@ -40,6 +47,8 @@ typedef struct Graphic {
     Window window;
     Display *display;
     XIC input_context;
+#else _WIN32
+    HDC device_context;
 #endif
     SpoorFont font;
     u8 mode;

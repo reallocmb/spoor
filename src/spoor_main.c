@@ -6,10 +6,9 @@
 #include"s_xlib.c"
 #include"s_win32.c"
 
-#define STATUS_BAR_HEIGHT 30
-
 void status_bar_render(Graphic *graphic)
 {
+    printf("CONFIG_STATUS_BAR_HEIGHT: %d\n", CONFIG_STATUS_BAR_HEIGHT);
     u16 height = CONFIG_STATUS_BAR_HEIGHT;
     u16 y = graphic->height - height;
 
@@ -36,8 +35,18 @@ void input_func(Graphic *graphic, u8 key)
         {
             exit(0);
         } break;
+
+        case ':':
+        {
+            graphic->mode = GRAPHIC_MODE_COMMAND_BUFFER;
+            graphic->command_buffer.buffer[0] = ':';
+            graphic->command_buffer.buffer[1] = 0;
+            graphic->command_buffer.buffer_count = 1;
+        } break;
     }
     printf("Key Pressed: %d\n", key);
+
+    graphic_update(graphic);
 }
 
 int main(void)
@@ -53,7 +62,7 @@ int main(void)
     //CONFIG_COLOR_BACKGROUND_SET(0xff883388);
     //CONFIG_GRAPHIC_SCALE_SET(2.1);
 
-    font_load(&spoor.graphic.font, "data/FreeMono.ttf", 30);
+    font_load(&spoor.graphic.font, "data/FreeMono.ttf", 25);
     status_bar_init(&spoor.graphic);
     graphic_init(&spoor.graphic);
     graphic_main_loop(&spoor.graphic);

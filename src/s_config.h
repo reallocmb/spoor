@@ -40,7 +40,7 @@ enum {
 u32 config_status_bar[] = {
     30,
     2,
-    0x22a08563,
+    0x11a08563,
     0xffa08563,
 };
 
