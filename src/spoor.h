@@ -100,7 +100,7 @@ struct Graphic {
     .display = NULL,
     .input_context = 0,
 #elif _WIN32
-    .device_context = 0;
+    .device_context = 0,
 #endif
 };
 

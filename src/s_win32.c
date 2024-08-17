@@ -3,36 +3,32 @@
 #ifdef _WIN32
 #include<windows.h>
 
-Graphic *global_graphic;
-
 #define win32_graphic_update graphic_update
-void win32_graphic_update(Graphic *grapic)
+void win32_graphic_update(void)
 {
     printf("graphic_update()\n");
     u32 i;
-    for (i = 0; i < global_graphic->pixels_count; i++)
-        global_graphic->pixels[i] = CONFIG_COLOR_BACKGROUND;
+    for (i = 0; i < GlobalGraphic.pixels_count; i++)
+        GlobalGraphic.pixels[i] = CONFIG_COLOR_BACKGROUND;
 
-    global_graphic->render_func(global_graphic);
-
-
+    GlobalGraphic.render_func();
 
     BITMAPINFO bitmapinfo;
     bitmapinfo.bmiHeader.biSize = sizeof(bitmapinfo.bmiHeader);
-    bitmapinfo.bmiHeader.biWidth = global_graphic->width;
-    bitmapinfo.bmiHeader.biHeight = -global_graphic->height;
+    bitmapinfo.bmiHeader.biWidth = GlobalGraphic.width;
+    bitmapinfo.bmiHeader.biHeight = -GlobalGraphic.height;
     bitmapinfo.bmiHeader.biPlanes = 1;
     bitmapinfo.bmiHeader.biBitCount = 32;
     bitmapinfo.bmiHeader.biCompression = BI_RGB;
 
-    StretchDIBits(global_graphic->device_context,
+    StretchDIBits(GlobalGraphic.device_context,
                   0, 0,
-                  global_graphic->width,
-                  global_graphic->height,
+                  GlobalGraphic.width,
+                  GlobalGraphic.height,
                   0, 0,
-                  global_graphic->width,
-                  global_graphic->height,
-                  global_graphic->pixels,
+                  GlobalGraphic.width,
+                  GlobalGraphic.height,
+                  GlobalGraphic.pixels,
                   &bitmapinfo,
                   DIB_RGB_COLORS,
                   SRCCOPY);
@@ -53,30 +49,30 @@ LRESULT main_wndproc(HWND window,
             RECT window_size;
             GetClientRect(window, &window_size);
             
-            global_graphic->width = window_size.right - window_size.left;
-            global_graphic->height = window_size.bottom - window_size.top;
+            GlobalGraphic.width = window_size.right - window_size.left;
+            GlobalGraphic.height = window_size.bottom - window_size.top;
             
-            if (global_graphic->pixels)
-                free(global_graphic->pixels);
+            if (GlobalGraphic.pixels)
+                free(GlobalGraphic.pixels);
             
-            global_graphic->pixels_count = global_graphic->width * global_graphic->height;
-            global_graphic->pixels = malloc(global_graphic->pixels_count * sizeof(*global_graphic->pixels));
+            GlobalGraphic.pixels_count = GlobalGraphic.width * GlobalGraphic.height;
+            GlobalGraphic.pixels = malloc(GlobalGraphic.pixels_count * sizeof(*GlobalGraphic.pixels));
         } break;
         
         case WM_PAINT:
         {
             PAINTSTRUCT paint;
-            global_graphic->device_context = BeginPaint(window, &paint);
+            GlobalGraphic.device_context = BeginPaint(window, &paint);
             printf("wm_paint\n");
             OutputDebugStringA("WM_PAINT\n");
-            graphic_update(global_graphic);
+            graphic_update();
             EndPaint(window, &paint);
         } break;
 
         case WM_CHAR:
         {
             printf("wm_char: %c\n", (char)w_param);
-            global_graphic->input_func(global_graphic, (u8) w_param);
+            GlobalGraphic.input_func((u8)w_param);
         } break;
 
         case WM_SYSKEYDOWN:
@@ -92,14 +88,14 @@ LRESULT main_wndproc(HWND window,
         {
             printf("wm_destroy\n");
             OutputDebugStringA("WM_DESTROY\n");
-            global_graphic->running = false;
+            GlobalGraphic.running = false;
         } break;
         
         case WM_CLOSE:
         {
             printf("wm_close\n");
             OutputDebugStringA("WM_CLOSE\n");
-            global_graphic->running = false;
+            GlobalGraphic.running = false;
         } break;
 
 #if 0
@@ -127,10 +123,8 @@ LRESULT main_wndproc(HWND window,
 }
 
 #define win32_init graphic_init
-void win32_init(Graphic *graphic)
+void win32_init(void)
 {
-    global_graphic = graphic;
-
     HINSTANCE instance = GetModuleHandle(NULL);
     WNDCLASS window_class = { 0 };
     window_class.lpszClassName = "SpoorClass";
@@ -156,33 +150,33 @@ void win32_init(Graphic *graphic)
                                   WS_OVERLAPPEDWINDOW | WS_VISIBLE,
                                   CW_USEDEFAULT,
                                   CW_USEDEFAULT,
-                                  global_graphic->width,
-                                  global_graphic->height,
+                                  GlobalGraphic.width,
+                                  GlobalGraphic.height,
                                   0,
                                   0,
                                   instance,
                                   0);
     
     HDC device_context = GetDC(NULL);
-    graphic->font.dpi_x = GetDeviceCaps(device_context, LOGPIXELSX);
-    graphic->font.dpi_y = GetDeviceCaps(device_context, LOGPIXELSY);
+    GlobalGraphic.font.dpi_x = GetDeviceCaps(device_context, LOGPIXELSX);
+    GlobalGraphic.font.dpi_y = GetDeviceCaps(device_context, LOGPIXELSY);
 
-    if (graphic->render_func == NULL)
-        graphic->render_func = render_default_func;
+    if (GlobalGraphic.render_func == NULL)
+        GlobalGraphic.render_func = render_default_func;
 
-    graphic->command_buffer.buffer = malloc(COMMAND_BUFFER_ALLOC * sizeof(graphic->command_buffer.buffer));
-    graphic->command_buffer.buffer[0] = 0;
-    graphic->command_buffer.count = 0;
-    memcpy(graphic->command_buffer.buffer,
+    GlobalGraphic.command_buffer.buffer = malloc(COMMAND_BUFFER_ALLOC_SIZE * sizeof(GlobalGraphic.command_buffer.buffer));
+    GlobalGraphic.command_buffer.buffer[0] = 0;
+    GlobalGraphic.command_buffer.count = 0;
+    memcpy(GlobalGraphic.command_buffer.buffer,
            L"NORMAL",
-           11 * sizeof(*graphic->command_buffer.buffer));
+           11 * sizeof(*GlobalGraphic.command_buffer.buffer));
 }
 
 #define win32_main_loop graphic_main_loop
-void win32_main_loop(Graphic *graphic)
+void win32_main_loop(void)
 {
     MSG message = { 0 };
-    while (global_graphic->running)
+    while (GlobalGraphic.running)
     {
         if (GetMessage(&message, NULL, 0, 0) > 0)
         {

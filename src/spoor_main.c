@@ -110,8 +110,11 @@ int main(void)
     //CONFIG_COLOR_BACKGROUND_SET(0xff883388);
     //CONFIG_GRAPHIC_SCALE_SET(2.1);
 
-    //font_load(&spoor.graphic.font, "data/FreeMono.ttf", 25);
+#if 1
+    font_load(&GlobalGraphic.font, "data/FreeMono.ttf", 25);
+#else
     font_load(&GlobalGraphic.font, "data/Essays1743.ttf", 40);
+#endif
     status_bar_init();
     views_init(&GlobalGraphic.views);
 
