@@ -1,6 +1,7 @@
 #ifndef SPOOR_H
 #define SPOOR_H
 
+#include"s_types.h"
 #include"s_config.h"
 // #include"s_commands.h" /* todo(mb) */
 #include"s_input.h"
@@ -23,10 +24,10 @@ typedef struct SpoorFont {
     u16 height;
 } SpoorFont;
 
-#define COMMAND_BUFFER_ALLOC 250
+#define COMMAND_BUFFER_ALLOC_SIZE 250
 
 typedef struct CommandBuffer {
-    wchar_t *buffer;
+    u8 *buffer;
     u32 count;
 } CommandBuffer;
 
@@ -35,15 +36,40 @@ enum {
     GRAPHIC_MODE_COMMAND_BUFFER,
 };
 
-typedef struct Graphic {
+#define SPOOR_VIEWS_ALLOC_SIZE 50
+
+#define VIEW_FLAG_PARENT 1
+#define VIEW_FLAG_VERTICAL (1 << 1)
+#define VIEW_FLAG_HORIZONTAL (1 << 2)
+
+typedef struct View {
+    char name[50];
+#if 1
+    u16 flags;
+    u16 id;
+    u16 x;
+    u16 y;
+    u16 width;
+    u16 height;
+    u16 parent_id;
+    u16 childs_count;
+    void (*render_func)(struct View *view); /* void *graphic => Graphic *graphic */
+#endif /* todo(mb) */
+} View;
+
+struct Graphic {
     bool running;
     u16 width;
     u16 height;
     u32 *pixels;
     u32 pixels_count;
-    void (*render_func)(struct Graphic *graphic);
-    void (*input_func)(struct Graphic *graphic, u8 key);
     CommandBuffer command_buffer;
+    SpoorFont font;
+    View *views;
+    u32 views_count;
+    u8 mode;
+    void (*render_func)(void);
+    void (*input_func)(u8 key);
 #ifdef __unix__
     XImage *image;
     Window window;
@@ -52,12 +78,30 @@ typedef struct Graphic {
 #elif _WIN32
     HDC device_context;
 #endif
-    SpoorFont font;
-    u8 mode;
-} Graphic;
-
-typedef struct Spoor {
-    Graphic graphic;
-} Spoor;
+} GlobalGraphic = {
+    .running = true,
+    .width = 800,
+    .height = 600,
+    .pixels = NULL,
+    .pixels_count = 0,
+    .command_buffer = {
+        .buffer = NULL,
+        .count = 0,
+    },
+    .font = { 0 },
+    .views = NULL,
+    .views_count = 0,
+    .mode = GRAPHIC_MODE_NORMAL,
+    .render_func = NULL,
+    .input_func = NULL,
+#ifdef __unix__
+    .image = NULL,
+    .window = 0,
+    .display = NULL,
+    .input_context = 0,
+#elif _WIN32
+    .device_context = 0;
+#endif
+};
 
 #endif

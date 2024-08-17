@@ -4,6 +4,8 @@ void font_size_set(SpoorFont *font, u32 size)
 {
     FT_Set_Char_Size(font->face, 0, size * CONFIG_GRAPHIC_SCALE * 64, font->dpi_x, font->dpi_y);
     //FT_Set_Pixel_Sizes(font->face, 0, size);
+    font->size = size;
+    font->height = (font->face->size->metrics.height >> 6);
 }
 
 void font_load(SpoorFont *font, const char *path, u32 size)
@@ -18,6 +20,4 @@ void font_load(SpoorFont *font, const char *path, u32 size)
     }
 
     font_size_set(font, size);
-
-    font->height = (font->face->size->metrics.height >> 6);
 }

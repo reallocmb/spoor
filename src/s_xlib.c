@@ -8,30 +8,30 @@
 #include<stdlib.h>
 
 #define xlib_graphic_update graphic_update
-void xlib_graphic_update(Graphic *graphic)
+void xlib_graphic_update(void)
 {
     /* clear */
     u32 i;
-    for (i = 0; i < graphic->pixels_count; i++)
-        graphic->pixels[i] = CONFIG_COLOR_BACKGROUND;
-    // graphic->pixels[10] = 0xffaaaa;
+    for (i = 0; i < GlobalGraphic.pixels_count; i++)
+        GlobalGraphic.pixels[i] = CONFIG_COLOR_BACKGROUND;
+    // GlobalGraphic.pixels[10] = 0xffaaaa;
 
-    graphic->render_func(graphic);
+    GlobalGraphic.render_func();
 
-    XPutImage(graphic->display,
-              graphic->window,
-              DefaultGC(graphic->display, 0),
-              graphic->image,
+    XPutImage(GlobalGraphic.display,
+              GlobalGraphic.window,
+              DefaultGC(GlobalGraphic.display, 0),
+              GlobalGraphic.image,
               0, 0,
               0, 0,
-              graphic->width, graphic->height);
+              GlobalGraphic.width, GlobalGraphic.height);
 }
 
 #define xlib_init graphic_init
-void xlib_init(Graphic *graphic)
+void xlib_init(void)
 {
-    graphic->display = XOpenDisplay(NULL);
-    if (graphic->display == NULL)
+    GlobalGraphic.display = XOpenDisplay(NULL);
+    if (GlobalGraphic.display == NULL)
     {
         /* todo(Mat) Logging? */
         fprintf(stderr,
@@ -39,10 +39,10 @@ void xlib_init(Graphic *graphic)
                 __FILE__, __LINE__);
     }
 
-    graphic->window = XCreateWindow(graphic->display,
-                           DefaultRootWindow(graphic->display),
+    GlobalGraphic.window = XCreateWindow(GlobalGraphic.display,
+                           DefaultRootWindow(GlobalGraphic.display),
                            0, 0,
-                           graphic->width, graphic->height,
+                           GlobalGraphic.width, GlobalGraphic.height,
                            0,
                            CopyFromParent,
                            InputOutput,
@@ -50,20 +50,20 @@ void xlib_init(Graphic *graphic)
                            0,
                            0);
 
-    Atom protocol_wm_delete_window = XInternAtom(graphic->display, "WM_DELETE_WINDOW", False);
-    XSetWMProtocols(graphic->display, graphic->window, &protocol_wm_delete_window, 1);
+    Atom protocol_wm_delete_window = XInternAtom(GlobalGraphic.display, "WM_DELETE_WINDOW", False);
+    XSetWMProtocols(GlobalGraphic.display, GlobalGraphic.window, &protocol_wm_delete_window, 1);
 
-    XSelectInput(graphic->display,
-                 graphic->window,
+    XSelectInput(GlobalGraphic.display,
+                 GlobalGraphic.window,
                  StructureNotifyMask |
                  ExposureMask |
                  KeyPressMask |
                  KeyReleaseMask);
 
-    XMapWindow(graphic->display, graphic->window);
+    XMapWindow(GlobalGraphic.display, GlobalGraphic.window);
 
-    graphic->image = XCreateImage(graphic->display,
-                                  DefaultVisual(graphic->display, 0),
+    GlobalGraphic.image = XCreateImage(GlobalGraphic.display,
+                                  DefaultVisual(GlobalGraphic.display, 0),
                                   24,
                                   ZPixmap,
                                   0,
@@ -79,7 +79,7 @@ void xlib_init(Graphic *graphic)
     printf("locale return: %s\n", str);
 #endif
 
-    XIM xim = XOpenIM(graphic->display,
+    XIM xim = XOpenIM(GlobalGraphic.display,
                       NULL,
                       NULL,
                       NULL);
@@ -89,58 +89,57 @@ void xlib_init(Graphic *graphic)
         return;
     }
 
-    graphic->input_context = XCreateIC(xim,
+    GlobalGraphic.input_context = XCreateIC(xim,
                                        XNInputStyle,
                                        XIMPreeditNothing | XIMStatusNothing,
                                        NULL);
 
-    if (graphic->render_func == NULL)
-        graphic->render_func = render_default_func;
+    if (GlobalGraphic.render_func == NULL)
+        GlobalGraphic.render_func = render_default_func;
 
-    graphic->command_buffer.buffer = malloc(COMMAND_BUFFER_ALLOC * sizeof(graphic->command_buffer.buffer));
-    graphic->command_buffer.buffer[0] = 0;
-    graphic->command_buffer.count = 0;
-    memcpy(graphic->command_buffer.buffer,
-           L"NORMAL",
-           7 * sizeof(*graphic->command_buffer.buffer));
+    GlobalGraphic.command_buffer.buffer = malloc(COMMAND_BUFFER_ALLOC_SIZE * sizeof(GlobalGraphic.command_buffer.buffer));
+    GlobalGraphic.command_buffer.buffer[0] = 0;
+    GlobalGraphic.command_buffer.count = 0;
+    memcpy(GlobalGraphic.command_buffer.buffer,
+           "NORMAL",
+           7 * sizeof(*GlobalGraphic.command_buffer.buffer));
 }
 
-
 #define xlib_graphic_main_loop graphic_main_loop
-void xlib_graphic_main_loop(Graphic *graphic)
+void xlib_graphic_main_loop(void)
 {
     XEvent event;
-    while (graphic->running)
+    while (GlobalGraphic.running)
     {
-        XNextEvent(graphic->display, &event);
+        XNextEvent(GlobalGraphic.display, &event);
         switch (event.type)
         {
             case Expose:
             {
                 printf("Expose\n");
-                xlib_graphic_update(graphic);
+                xlib_graphic_update();
             } break;
 
             case ConfigureNotify:
             {
                 printf("ConfigureNotify\n");
 
-                graphic->width = event.xconfigure.width;
-                graphic->height = event.xconfigure.height;
+                GlobalGraphic.width = event.xconfigure.width;
+                GlobalGraphic.height = event.xconfigure.height;
                 printf("Width: %d Height %d\n",
-                       graphic->width,
-                       graphic->height);
+                       GlobalGraphic.width,
+                       GlobalGraphic.height);
 
-                if (graphic->pixels)
-                    free(graphic->pixels);
+                if (GlobalGraphic.pixels)
+                    free(GlobalGraphic.pixels);
 
-                graphic->pixels_count = graphic->width * graphic->height;
-                graphic->pixels = malloc(graphic->pixels_count * sizeof(*graphic->pixels));
+                GlobalGraphic.pixels_count = GlobalGraphic.width * GlobalGraphic.height;
+                GlobalGraphic.pixels = malloc(GlobalGraphic.pixels_count * sizeof(*GlobalGraphic.pixels));
 
-                graphic->image->width = graphic->width;
-                graphic->image->height = graphic->height;
-                graphic->image->bytes_per_line = graphic->width * sizeof(*graphic->pixels);
-                graphic->image->data = (char *)graphic->pixels;
+                GlobalGraphic.image->width = GlobalGraphic.width;
+                GlobalGraphic.image->height = GlobalGraphic.height;
+                GlobalGraphic.image->bytes_per_line = GlobalGraphic.width * sizeof(*GlobalGraphic.pixels);
+                GlobalGraphic.image->data = (char *)GlobalGraphic.pixels;
             } break;
 
             case KeyPress:
@@ -150,13 +149,13 @@ void xlib_graphic_main_loop(Graphic *graphic)
                 KeySym key;
                 printf("KeyPress\n");
                 Status status;
-                int buffer_bytes = XmbLookupString(graphic->input_context,
+                int buffer_bytes = XmbLookupString(GlobalGraphic.input_context,
                                                    &event.xkey,
                                                    buffer,
                                                    255,
                                                    &key,
                                                    &status);
-                int wbuffer_bytes = XwcLookupString(graphic->input_context,
+                int wbuffer_bytes = XwcLookupString(GlobalGraphic.input_context,
                                                     &event.xkey,
                                                     wbuffer,
                                                     255,
@@ -173,7 +172,7 @@ void xlib_graphic_main_loop(Graphic *graphic)
                 printf("bytes: %d\n", wbuffer_bytes);
 
 
-                graphic->input_func(graphic, buffer[0]);
+                GlobalGraphic.input_func(buffer[0]);
             } break;
 
             case KeyRelease:
@@ -185,7 +184,7 @@ void xlib_graphic_main_loop(Graphic *graphic)
             {
                 printf("ClientMessage WM_DELETE_WINDOW\n");
 
-                graphic->running = false;
+                GlobalGraphic.running = false;
             } break;
 
             default:
