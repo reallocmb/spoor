@@ -18,7 +18,7 @@ void task_list_render_func(View *view)
 
 void render_func(void)
 {
-    views_render(GlobalGraphic.views, GlobalGraphic.views_count);
+    views_render(GlobalGraphic.views);
     status_bar_render_func();
 }
 
@@ -41,6 +41,7 @@ void input_func(u8 key)
             {
                 view_append(&GlobalGraphic.views,
                             &GlobalGraphic.views_count,
+                            &GlobalGraphic.views_index,
                             VIEW_FLAG_HORIZONTAL,
                             task_list_render_func);
             } break;
@@ -50,6 +51,7 @@ void input_func(u8 key)
                 printf("view append vertical\n");
                 view_append(&GlobalGraphic.views,
                             &GlobalGraphic.views_count,
+                            &GlobalGraphic.views_index,
                             VIEW_FLAG_VERTICAL,
                             view_default_render_func);
 
@@ -60,6 +62,7 @@ void input_func(u8 key)
                 printf("view append horizontal\n");
                 view_append(&GlobalGraphic.views,
                             &GlobalGraphic.views_count,
+                            &GlobalGraphic.views_index,
                             VIEW_FLAG_HORIZONTAL,
                             view_default_render_func);
             } break;
@@ -73,6 +76,15 @@ void input_func(u8 key)
 
         if (strncmp((char *)GlobalGraphic.command_buffer.buffer + GlobalGraphic.command_buffer.count - 2, "qq", 2) == 0)
             exit(0);
+
+        if (strncmp((char *)GlobalGraphic.command_buffer.buffer + GlobalGraphic.command_buffer.count - 2, " s", 2) == 0)
+            printf("wind left...\n");
+        if (strncmp((char *)GlobalGraphic.command_buffer.buffer + GlobalGraphic.command_buffer.count - 2, " n", 2) == 0)
+            printf("wind down...\n");
+        if (strncmp((char *)GlobalGraphic.command_buffer.buffer + GlobalGraphic.command_buffer.count - 2, " r", 2) == 0)
+            printf("wind up...\n");
+        if (strncmp((char *)GlobalGraphic.command_buffer.buffer + GlobalGraphic.command_buffer.count - 2, " t", 2) == 0)
+            printf("wind right...\n");
     }
     else if (GlobalGraphic.mode == GRAPHIC_MODE_COMMAND_BUFFER)
     {
@@ -110,8 +122,10 @@ int main(void)
     //CONFIG_COLOR_BACKGROUND_SET(0xff883388);
     //CONFIG_GRAPHIC_SCALE_SET(2.1);
 
-#if 1
+#if 0
     font_load(&GlobalGraphic.font, "data/FreeMono.ttf", 25);
+#elif 1
+    font_load(&GlobalGraphic.font, "data/LiberationMono-Regular.ttf", 40);
 #else
     font_load(&GlobalGraphic.font, "data/Essays1743.ttf", 40);
 #endif

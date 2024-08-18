@@ -42,8 +42,10 @@ enum {
 #define VIEW_FLAG_VERTICAL (1 << 1)
 #define VIEW_FLAG_HORIZONTAL (1 << 2)
 
+#define VIEW_NO_PARENT 0xffff
+
 typedef struct View {
-    char name[50];
+    // char name[50];
 #if 1
     u16 flags;
     u16 id;
@@ -67,6 +69,7 @@ struct Graphic {
     SpoorFont font;
     View *views;
     u32 views_count;
+    u32 views_index;
     u8 mode;
     void (*render_func)(void);
     void (*input_func)(u8 key);
