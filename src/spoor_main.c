@@ -9,10 +9,14 @@
 
 void task_list_render_func(View *view)
 {
-    render_rectangle(5, 5, view->width - 10, view->height - 10, 0x55a08563);
+    u16 x = view->x;
+    u16 y = view->y;
+    u16 width = view->width;
+    u16 height = view->height;
+
     u32 size = GlobalGraphic.font.size;
     font_size_set(&GlobalGraphic.font, 15);
-    render_text(50, 50, (u8 *)"Mein Name ist Matthias, was ist deiner?", 0xffaa33bb);
+    render_text(x + 50, y + GlobalGraphic.font.height, (u8 *)"Mein Name ist Matthias, was ist deiner?", 0xffaa33bb);
     font_size_set(&GlobalGraphic.font, size);
 }
 
@@ -35,15 +39,6 @@ void input_func(u8 key)
                 GlobalGraphic.command_buffer.buffer[0] = ':';
                 GlobalGraphic.command_buffer.buffer[1] = 0;
                 GlobalGraphic.command_buffer.count = 1;
-            } break;
-
-            case 'l':
-            {
-                view_append(&GlobalGraphic.views,
-                            &GlobalGraphic.views_count,
-                            &GlobalGraphic.views_index,
-                            VIEW_FLAG_HORIZONTAL,
-                            task_list_render_func);
             } break;
 
             case SPOOR_INPUT_ASCII_KEY_CONTROL_S:
@@ -74,17 +69,38 @@ void input_func(u8 key)
             } break;
         }
 
-        if (strncmp((char *)GlobalGraphic.command_buffer.buffer + GlobalGraphic.command_buffer.count - 2, "qq", 2) == 0)
-            exit(0);
+        bool have_to_command_buffer_clear = true;
 
-        if (strncmp((char *)GlobalGraphic.command_buffer.buffer + GlobalGraphic.command_buffer.count - 2, " s", 2) == 0)
+        if (strncmp((char *)GlobalGraphic.command_buffer.buffer + GlobalGraphic.command_buffer.count - 2, "lt", 2) == 0)
+        {
+            GlobalGraphic.views[GlobalGraphic.views_index].render_func = task_list_render_func;
+        }
+        else if (strncmp((char *)GlobalGraphic.command_buffer.buffer + GlobalGraphic.command_buffer.count - 2, " s", 2) == 0)
+        {
             printf("wind left...\n");
-        if (strncmp((char *)GlobalGraphic.command_buffer.buffer + GlobalGraphic.command_buffer.count - 2, " n", 2) == 0)
+            view_focus_left(&GlobalGraphic.views_index);
+        }
+        else if (strncmp((char *)GlobalGraphic.command_buffer.buffer + GlobalGraphic.command_buffer.count - 2, " n", 2) == 0)
+        {
             printf("wind down...\n");
-        if (strncmp((char *)GlobalGraphic.command_buffer.buffer + GlobalGraphic.command_buffer.count - 2, " r", 2) == 0)
+            view_focus_down(&GlobalGraphic.views_index);
+        }
+        else if (strncmp((char *)GlobalGraphic.command_buffer.buffer + GlobalGraphic.command_buffer.count - 2, " r", 2) == 0)
+        {
             printf("wind up...\n");
-        if (strncmp((char *)GlobalGraphic.command_buffer.buffer + GlobalGraphic.command_buffer.count - 2, " t", 2) == 0)
+            view_focus_up(&GlobalGraphic.views_index);
+        }
+        else if (strncmp((char *)GlobalGraphic.command_buffer.buffer + GlobalGraphic.command_buffer.count - 2, " t", 2) == 0)
+        {
             printf("wind right...\n");
+            view_focus_right(&GlobalGraphic.views_index);
+        }
+        else
+            have_to_command_buffer_clear = false;
+
+
+        if (have_to_command_buffer_clear)
+            command_buffer_clear(&GlobalGraphic.command_buffer);
     }
     else if (GlobalGraphic.mode == GRAPHIC_MODE_COMMAND_BUFFER)
     {
@@ -121,11 +137,16 @@ int main(void)
 
     //CONFIG_COLOR_BACKGROUND_SET(0xff883388);
     //CONFIG_GRAPHIC_SCALE_SET(2.1);
+    
+    CONFIG_STATUS_BAR_FONT_SIZE_SET(40);
+    CONFIG_VIEW_FONT_SIZE_SET(12);
+    CONFIG_VIEW_BORDER_SIZE_SET(1);
+    CONFIG_VIEW_GAP_SIZE_SET(4);
 
 #if 0
     font_load(&GlobalGraphic.font, "data/FreeMono.ttf", 25);
 #elif 1
-    font_load(&GlobalGraphic.font, "data/LiberationMono-Regular.ttf", 40);
+    font_load(&GlobalGraphic.font, "data/LiberationMono-Regular.ttf", CONFIG_STATUS_BAR_FONT_SIZE);
 #else
     font_load(&GlobalGraphic.font, "data/Essays1743.ttf", 40);
 #endif

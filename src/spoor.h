@@ -39,8 +39,10 @@ enum {
 #define SPOOR_VIEWS_ALLOC_SIZE 50
 
 #define VIEW_FLAG_PARENT 1
-#define VIEW_FLAG_VERTICAL (1 << 1)
-#define VIEW_FLAG_HORIZONTAL (1 << 2)
+#define VIEW_FLAG_HORIZONTAL (1 << 1)
+#define VIEW_FLAG_VERTICAL (1 << 2)
+
+#define VIEW_FLAG_CHILD (VIEW_FLAG_HORIZONTAL | VIEW_FLAG_VERTICAL)
 
 #define VIEW_NO_PARENT 0xffff
 
@@ -106,5 +108,10 @@ struct Graphic {
     .device_context = 0,
 #endif
 };
+
+#if 0
+typedef struct SpoorObject {
+} SpoorObject;
+#endif
 
 #endif

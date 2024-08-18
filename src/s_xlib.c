@@ -100,9 +100,6 @@ void xlib_init(void)
     GlobalGraphic.command_buffer.buffer = malloc(COMMAND_BUFFER_ALLOC_SIZE * sizeof(GlobalGraphic.command_buffer.buffer));
     GlobalGraphic.command_buffer.buffer[0] = 0;
     GlobalGraphic.command_buffer.count = 0;
-    memcpy(GlobalGraphic.command_buffer.buffer,
-           "NORMAL",
-           7 * sizeof(*GlobalGraphic.command_buffer.buffer));
 }
 
 #define xlib_graphic_main_loop graphic_main_loop

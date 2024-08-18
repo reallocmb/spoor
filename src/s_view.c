@@ -5,6 +5,49 @@ void views_init(View **views)
     *views = malloc(SPOOR_VIEWS_ALLOC_SIZE * sizeof(*views));
 }
 
+void view_border_render(View *view)
+{
+
+    u16 x = view->x;
+    u16 y = view->y;
+    u16 width = view->width;
+    u16 height = view->height;
+
+    x += CONFIG_VIEW_GAP_SIZE;
+    y += CONFIG_VIEW_GAP_SIZE;
+    width -= CONFIG_VIEW_GAP_SIZE * 2;
+    height -= CONFIG_VIEW_GAP_SIZE * 2;
+
+
+    u32 color_fill = 0x44aaaaaa;
+    u32 color = CONFIG_COLOR_FOREGROUND;
+    if (view - GlobalGraphic.views == GlobalGraphic.views_index)
+    {
+        color_fill = 0x22cccccc;
+        color = CONFIG_VIEW_BORDER_COLOR;
+    }
+
+#if 0
+    render_rectangle_fill(x, y, width, height, color_fill);
+#endif
+    u32 i;
+    for (i = 0; i < CONFIG_VIEW_BORDER_SIZE; i++)
+    {
+        render_rectangle(x + i,
+                         y + i,
+                         width - i * 2,
+                         height - i * 2,
+                         color);
+    }
+
+#if 1
+    view->x += CONFIG_VIEW_BORDER_SIZE + CONFIG_VIEW_GAP_SIZE;
+    view->y += CONFIG_VIEW_BORDER_SIZE + CONFIG_VIEW_GAP_SIZE;
+    view->width -= CONFIG_VIEW_BORDER_SIZE * 2 + CONFIG_VIEW_GAP_SIZE * 2;
+    view->height -= CONFIG_VIEW_BORDER_SIZE * 2 + CONFIG_VIEW_GAP_SIZE * 2;
+#endif
+}
+
 void view_default_render_func(View *view)
 {
     SpoorFont *font = &GlobalGraphic.font;
@@ -14,33 +57,10 @@ void view_default_render_func(View *view)
     u16 width = view->width;
     u16 height = view->height;
 
-    const u16 gap = 0;
-
-    x += gap / 2;
-    y += gap / 2;
-    width -= gap;
-    height -= gap;
-
-
-    if (view - GlobalGraphic.views == GlobalGraphic.views_index)
-    {
-        render_rectangle_fill(x, y, width, height, 0x55333333);
-        render_rectangle(x, y, width, height, 0xffffffff);
-        render_rectangle(x + 1, y + 1, width - 2, height - 2, 0xffffffff);
-        render_rectangle(x + 2, y + 2, width - 4, height - 4, 0xffffffff);
-        render_rectangle(x + 3, y + 3, width - 6, height - 6, 0xffffffff);
-    }
-    else
-    {
-        render_rectangle_fill(x, y, width, height, 0x22aaaaaa);
-        render_rectangle(x, y, width, height, CONFIG_COLOR_FOREGROUND);
-        render_rectangle(x + 1, y + 1, width - 2, height - 2, CONFIG_COLOR_FOREGROUND);
-        render_rectangle(x + 2, y + 2, width - 4, height - 4, CONFIG_COLOR_FOREGROUND);
-        render_rectangle(x + 3, y + 3, width - 6, height - 6, CONFIG_COLOR_FOREGROUND);
-    }
-
     u32 size = font->size;
-    font_size_set(font, 15);
+#if 1
+    font_size_set(font, CONFIG_VIEW_FONT_SIZE);
+#endif
 
     x += 10;
     y += font->height;
@@ -91,17 +111,20 @@ void view_default_render_func(View *view)
 
     // void (*render_func)(struct View *view); /* void *graphic => Graphic *graphic */
 
+#if 1
     font_size_set(font, size);
+#endif
 }
 
-void views_childs_render(View *views, u16 *i)
+View *views_childs_render(View **views) /* todo(mb) it's crap */
 {
-    u16 parent_id = *i;
-    View *child = &views[++(*i)];
-    u16 childs_count = views[parent_id].childs_count;
+    View *parent = *views;
+    View *child = *views + 1;
 
-    u16 parent_width = views[parent_id].width;
-    u16 parent_height = views[parent_id].height;
+    u16 childs_count = parent->childs_count;
+
+    u16 parent_width = parent->width;
+    u16 parent_height = parent->height;
 
     u16 cw = parent_width / childs_count;
     u16 ch = 0;
@@ -116,22 +139,27 @@ void views_childs_render(View *views, u16 *i)
         parent_width = cw;
 
     u16 k;
-    for (k = 0; k < views->childs_count; k++)
+    for (k = 0; k < childs_count; k++)
     {
-        child = &views[*i];
         child->width = parent_width;
         child->height = parent_height;
-        child->x = views[parent_id].x + k * cw;
-        child->y = views[parent_id].y + k * ch;
+        child->x = parent->x + k * cw;
+        child->y = parent->y + k * ch;
+        child->id = child - GlobalGraphic.views;
 
-        if (views[*i].flags & VIEW_FLAG_PARENT)
-            views_childs_render(&views[*i], i);
+        if (child->flags & VIEW_FLAG_PARENT)
+        {
+            child = views_childs_render(&child);
+        }
         else
         {
-            views[*i].render_func(&views[*i]);
-            (*i)++;
+            view_border_render(child);
+            child->render_func(child);
+            child++;
         }
     }
+    
+    return child;
 }
 
 void views_render(View *views)
@@ -144,11 +172,13 @@ void views_render(View *views)
     views->x = 0;
     views->y = 0;
 
-    u16 i = 0;
     if (views->flags & VIEW_FLAG_PARENT)
-        views_childs_render(views, &i);
+        views_childs_render(&views);
     else
+    {
+        view_border_render(views);
         views->render_func(views);
+    }
 }
 
 void view_append(View **head,
@@ -161,7 +191,6 @@ void view_append(View **head,
         *head = realloc(*head, *views_count + SPOOR_VIEWS_ALLOC_SIZE * sizeof(**head));
 
     View *views = *head;
-    View *parent = &views[*views_index];
 
     if (*views_count == 0)
     {
@@ -179,6 +208,7 @@ void view_append(View **head,
         u16 child0_id = (*views_count)++;
         u16 child1_id = (*views_count)++;
 
+        View *parent = &views[*views_index];
         View *child0 = &views[child0_id];
         View *child1 = &views[child1_id];
 
@@ -199,9 +229,10 @@ void view_append(View **head,
 
         *views_index = child1_id;
     }
-    else if (((parent->flags & 3) | flags) == 3)
+    else if (((views[*views_index].flags & VIEW_FLAG_CHILD) | flags) == VIEW_FLAG_CHILD)
     {
-        memcpy(parent + 3, parent + 1, (parent - &views[*views_count - 1]) * sizeof(*views));
+        View *parent = &views[*views_index];
+        memcpy(parent + 3, parent + 1, (&views[*views_count - 1] - parent) * sizeof(*views));
 
         u16 child0_id = parent->id + 1;
         u16 child1_id = parent->id + 2;
@@ -222,7 +253,7 @@ void view_append(View **head,
         child1->render_func = render_func;
 
         parent->childs_count = 2;
-        parent->flags |= flags;
+        parent->flags |= VIEW_FLAG_PARENT;
 
         *views_index = child1_id;
 
@@ -230,9 +261,12 @@ void view_append(View **head,
     }
     else
     {
-        memcpy(parent + 2, parent + 1, (parent - &views[*views_count - 1]) * sizeof(*views));
+        View *parent = &views[views[*views_index].parent_id];
+        View *index = &views[*views_index];
 
-        u16 child0_id = parent->id + 1;
+        memcpy(index + 2, index + 1, (&views[*views_count - 1] - index) * sizeof(*views));
+
+        u16 child0_id = index - views + 1;
 
         View *child0 = &views[child0_id];
 
@@ -248,4 +282,52 @@ void view_append(View **head,
 
         (*views_count)++;
     }
+}
+
+void views_debug(View *views)
+{
+}
+
+void view_focus_left(u32 *views_index)
+{
+    do
+    {
+        if (*views_index == 0)
+            return;
+        *views_index -= 1;
+    }
+    while (GlobalGraphic.views[*views_index].flags & VIEW_FLAG_PARENT);
+}
+
+void view_focus_down(u32 *views_index)
+{
+    do
+    {
+        if (GlobalGraphic.views_count - 1 == *views_index)
+            return;
+        *views_index += 1;
+    }
+    while (GlobalGraphic.views[*views_index].flags & VIEW_FLAG_PARENT);
+}
+
+void view_focus_up(u32 *views_index)
+{
+    do
+    {
+        if (*views_index == 0)
+            return;
+        *views_index -= 1;
+    }
+    while (GlobalGraphic.views[*views_index].flags & VIEW_FLAG_PARENT);
+}
+
+void view_focus_right(u32 *views_index)
+{
+    do
+    {
+        if (GlobalGraphic.views_count - 1 == *views_index)
+            return;
+        *views_index += 1;
+    }
+    while (GlobalGraphic.views[*views_index].flags & VIEW_FLAG_PARENT);
 }

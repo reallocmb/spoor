@@ -18,3 +18,9 @@ void command_buffer_execute(void)
     sprintf(error_buffer, "command '%s' not found try ':help'", command_buffer->buffer);
     memcpy(command_buffer->buffer, error_buffer, strlen(error_buffer) + 1 * sizeof(error_buffer));
 }
+
+void command_buffer_clear(CommandBuffer *command_buffer)
+{
+    GlobalGraphic.command_buffer.buffer[0] = 0;
+    GlobalGraphic.command_buffer.count = 0;
+}

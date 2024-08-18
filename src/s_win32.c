@@ -82,6 +82,7 @@ LRESULT main_wndproc(HWND window,
 
         case WM_KEYDOWN:
         {
+            printf("keydown: %lld\n", w_param);
         } break;
         
         case WM_DESTROY:
@@ -158,8 +159,10 @@ void win32_init(void)
                                   0);
     
     HDC device_context = GetDC(NULL);
+#if 0
     GlobalGraphic.font.dpi_x = GetDeviceCaps(device_context, LOGPIXELSX);
     GlobalGraphic.font.dpi_y = GetDeviceCaps(device_context, LOGPIXELSY);
+#endif
 
     if (GlobalGraphic.render_func == NULL)
         GlobalGraphic.render_func = render_default_func;
@@ -167,9 +170,6 @@ void win32_init(void)
     GlobalGraphic.command_buffer.buffer = malloc(COMMAND_BUFFER_ALLOC_SIZE * sizeof(GlobalGraphic.command_buffer.buffer));
     GlobalGraphic.command_buffer.buffer[0] = 0;
     GlobalGraphic.command_buffer.count = 0;
-    memcpy(GlobalGraphic.command_buffer.buffer,
-           L"NORMAL",
-           11 * sizeof(*GlobalGraphic.command_buffer.buffer));
 }
 
 #define win32_main_loop graphic_main_loop
