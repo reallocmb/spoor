@@ -109,9 +109,58 @@ struct Graphic {
 #endif
 };
 
-#if 0
+enum {
+    SPOOR_STATUS_NOT_STARTED,
+    SPOOR_STATUS_IN_PROGRESS,
+    SPOOR_STATUS_COMPLETED,
+};
+
+enum {
+    SPOOR_TYPE_TASK,
+    SPOOR_TYPE_PROJECT,
+    SPOOR_TYPE_EVENT,
+    SPOOR_TYPE_APPOINTMENT,
+    SPOOR_TYPE_GOAL,
+    SPOOR_TYPE_HABIT,
+};
+
+typedef struct SpoorTime {
+    s32 sec;
+    s32 min;
+    s32 hour;
+    s32 day;
+    s32 mon;
+    s32 year;
+} SpoorTime;
+
+typedef struct SpoorTimeSpan {
+    SpoorTime start;
+    SpoorTime end;
+} SpoorTimeSpan; // 48 bytes
+
+typedef struct SOTT {
+    u32 id; // 4 bytes
+    u32 flags; // 4 bytes
+    SpoorTimeSpan time_spans[10]; // 10 * 48 bytes = 480
+    u32 time_spans_count; // 4 bytes
+    u32 id_prev; // 4 bytes
+    u32 id_next; // 4 bytes
+} SOTT; // 496 bytes
+        
+#define SPOOR_OBJECT_TITLE_SIZE_MAX 244
+
 typedef struct SpoorObject {
-} SpoorObject;
-#endif
+    u32 id; // 4 bytes
+    u32 flags; // 4 bytes
+    char title[SPOOR_OBJECT_TITLE_SIZE_MAX]; //  250
+    SpoorTimeSpan deadline; // 48 bytes
+    SpoorTimeSpan schedule; // 48 bytes
+    u32 schedule_id_next; // 4 bytes
+    SpoorTimeSpan tracked; // 48 bytes
+    SpoorTimeSpan complete; // 48 bytes
+    SpoorTimeSpan created; // 48 bytes
+    u8 status; // 1 byte
+    u8 type; // 1 byte
+} SpoorObject; // 500 bytes
 
 #endif

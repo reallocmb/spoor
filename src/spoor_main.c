@@ -11,8 +11,10 @@ void task_list_render_func(View *view)
 {
     u16 x = view->x;
     u16 y = view->y;
+#if 0
     u16 width = view->width;
     u16 height = view->height;
+#endif
 
     u32 size = GlobalGraphic.font.size;
     font_size_set(&GlobalGraphic.font, 15);
@@ -132,6 +134,9 @@ void input_func(u8 key)
 
 int main(void)
 {
+    printf("SOTT bytes %ld\n", sizeof(SOTT));
+    printf("SpoorObject bytes %ld\n", sizeof(SpoorObject));
+
     GlobalGraphic.render_func = render_func;
     GlobalGraphic.input_func = input_func;
 

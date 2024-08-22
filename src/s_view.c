@@ -19,13 +19,9 @@ void view_border_render(View *view)
     height -= CONFIG_VIEW_GAP_SIZE * 2;
 
 
-    u32 color_fill = 0x44aaaaaa;
     u32 color = CONFIG_COLOR_FOREGROUND;
     if (view - GlobalGraphic.views == GlobalGraphic.views_index)
-    {
-        color_fill = 0x22cccccc;
         color = CONFIG_VIEW_BORDER_COLOR;
-    }
 
 #if 0
     render_rectangle_fill(x, y, width, height, color_fill);
@@ -54,8 +50,10 @@ void view_default_render_func(View *view)
 
     u16 x = view->x;
     u16 y = view->y;
+#if 0
     u16 width = view->width;
     u16 height = view->height;
+#endif
 
     u32 size = font->size;
 #if 1
@@ -92,9 +90,11 @@ void view_default_render_func(View *view)
     render_text(x, y, (u8 *)buffer, CONFIG_COLOR_FOREGROUND);
     y += font->height;
 
+#if 0
     sprintf(buffer, "AREA: (%i, %i) (%i, %i)",
             view->x, view->y,
-            view->width, view->height);
+            width, height);
+#endif
     render_text(x, y, (u8 *)buffer, CONFIG_COLOR_FOREGROUND);
     y += font->height;
 
@@ -284,8 +284,14 @@ void view_append(View **head,
     }
 }
 
-void views_debug(View *views)
+void view_close(u32 index)
 {
+    u32 *views_count = &GlobalGraphic.views_count;
+
+    if (index == 1)
+    {
+        *views_count = 0;
+    }
 }
 
 void view_focus_left(u32 *views_index)
