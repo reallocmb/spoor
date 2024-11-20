@@ -36,29 +36,29 @@ void task_list_render_func(View *view)
         x_backup = x;
         char buffer_i[5];
         sprintf(buffer_i, "%i", i);
-        render_text(x, y, buffer_i, CONFIG_COLOR_FOREGROUND);
+        render_text(x, y, (u8 *)buffer_i, CONFIG_COLOR_FOREGROUND);
         x += 20;
-        render_text(x, y, task_list_data->spoor_objects[i].title, CONFIG_COLOR_FOREGROUND);
+        render_text(x, y, (u8 *)task_list_data->spoor_objects[i].title, CONFIG_COLOR_FOREGROUND);
         char time_span_format[22];
         /* deadline */
 		spoor_time_span_deadline_format_create(&task_list_data->spoor_objects[i].deadline,
 											   time_span_format);
         x += 140;
-        render_text(x, y, time_span_format, CONFIG_COLOR_FOREGROUND);
+        render_text(x, y, (u8 *)time_span_format, CONFIG_COLOR_FOREGROUND);
 
         /* schedule */
         spoor_time_span_schedule_format_create(&task_list_data->spoor_objects[i].schedule,
                                                time_span_format);
         x += 150;
-        render_text(x, y, time_span_format, CONFIG_COLOR_FOREGROUND);
+        render_text(x, y, (u8 *)time_span_format, CONFIG_COLOR_FOREGROUND);
 
         /* type */
         x += 210;
-        render_text(x, y, SPOOR_TYPES[task_list_data->spoor_objects[i].type], CONFIG_COLOR_FOREGROUND);
+        render_text(x, y, (u8 *)SPOOR_TYPES[task_list_data->spoor_objects[i].type], CONFIG_COLOR_FOREGROUND);
 
         /* status */
         x += 80;
-        render_text(x, y, SPOOR_STATUS[task_list_data->spoor_objects[i].status], CONFIG_COLOR_STATUS[task_list_data->spoor_objects[i].status]);
+        render_text(x, y, (u8 *)SPOOR_STATUS[task_list_data->spoor_objects[i].status], CONFIG_COLOR_STATUS[task_list_data->spoor_objects[i].status]);
 
         y += GlobalGraphic.font.height;
     }

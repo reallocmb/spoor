@@ -19,7 +19,7 @@ void render_func(void)
 
 void input_func(u8 key)
 {
-    printf("char %c\n", key);
+    printf("input -> char %c\n", key);
     if (GlobalGraphic.mode == GRAPHIC_MODE_NORMAL)
     {
         switch (key)
@@ -113,6 +113,11 @@ void input_func(u8 key)
             case SPOOR_INPUT_ASCII_KEY_BACKSPACE:
             {
                 GlobalGraphic.command_buffer.buffer[--GlobalGraphic.command_buffer.count] = 0;
+            } break;
+            
+            case 0:
+            {
+                printf("000000\n");
             } break;
 
             default:

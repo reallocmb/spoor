@@ -9,7 +9,7 @@ void command_buffer_execute(void)
     else if (strncmp((char *)command_buffer->buffer, ":c", 2) == 0)
     {
         SpoorObject spoor_object;
-        spoor_object_create(&spoor_object, command_buffer->buffer + 2, command_buffer->count - 2, NULL);
+        spoor_object_create(&spoor_object, (char *)command_buffer->buffer + 2, command_buffer->count - 2, NULL);
         spoor_object_save(&spoor_object);
         spoor_object_print(&spoor_object);
     }
@@ -18,7 +18,7 @@ void command_buffer_execute(void)
         Data *data = (Data *)GlobalGraphic.views[GlobalGraphic.views_index].data;
         SpoorObject *spoor_objects = data->spoor_objects;
         SpoorObject *spoor_object = &spoor_objects[data->index];
-        spoor_object_create(spoor_object, command_buffer->buffer + 2, command_buffer->count - 2, spoor_object);
+        spoor_object_create(spoor_object, (char *)command_buffer->buffer + 2, command_buffer->count - 2, spoor_object);
         spoor_object_save(spoor_object);
         spoor_object_print(spoor_object);
         printf(":e ->>>>>>>> test\n");

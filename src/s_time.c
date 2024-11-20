@@ -1,8 +1,10 @@
+#include"spoor.h"
+
 #include<time.h>
 
 void spoor_time_format_append(char *buffer, u32 *buffer_i, s32 value, u32 digit_count)
 {
-    if (value == SPOOR_TIME_DEFAULT_VALUE)
+    if (value == (s32)SPOOR_TIME_DEFAULT_VALUE)
     {
         while (digit_count--)
             buffer[(*buffer_i)++] = '-';
@@ -152,7 +154,6 @@ void spoor_time_span_create(SpoorTimeSpan *spoor_time_span, char *argument, u32 
     u32 flags = 0;
 
     char *end;
-    char *first = argument;
     if (*argument == '-')
     {
         flags |= FLAG_DASH;
@@ -250,7 +251,7 @@ void spoor_time_span_create(SpoorTimeSpan *spoor_time_span, char *argument, u32 
         spoor_time_span->start.year += month / 12;
         spoor_time_span->start.mon = month % 12;
     }
-    if (time_values[0] != SPOOR_TIME_DEFAULT_VALUE)
+    if (time_values[0] != (s32)SPOOR_TIME_DEFAULT_VALUE)
     {
         spoor_time_span->start.hour = time_values[0] / 100;
         spoor_time_span->start.min = time_values[0] % 100;
@@ -285,7 +286,7 @@ void spoor_time_span_create(SpoorTimeSpan *spoor_time_span, char *argument, u32 
         spoor_time_span->end.mon = month % 12;
     }
 
-    if (time_values[1] != SPOOR_TIME_DEFAULT_VALUE)
+    if (time_values[1] != (s32)SPOOR_TIME_DEFAULT_VALUE)
     {
         spoor_time_span->end.hour = time_values[1] / 100;
         spoor_time_span->end.min = time_values[1] % 100;
