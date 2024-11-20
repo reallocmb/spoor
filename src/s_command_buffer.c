@@ -6,6 +6,23 @@ void command_buffer_execute(void)
     if (memcmp(command_buffer->buffer, ":open", 5 * sizeof(*command_buffer->buffer)) == 0)
     {
     }
+    else if (strncmp((char *)command_buffer->buffer, ":c", 2) == 0)
+    {
+        SpoorObject spoor_object;
+        spoor_object_create(&spoor_object, command_buffer->buffer + 2, command_buffer->count - 2, NULL);
+        spoor_object_save(&spoor_object);
+        spoor_object_print(&spoor_object);
+    }
+    else if (strncmp((char *)command_buffer->buffer, ":e", 2) == 0)
+    {
+        Data *data = (Data *)GlobalGraphic.views[GlobalGraphic.views_index].data;
+        SpoorObject *spoor_objects = data->spoor_objects;
+        SpoorObject *spoor_object = &spoor_objects[data->index];
+        spoor_object_create(spoor_object, command_buffer->buffer + 2, command_buffer->count - 2, spoor_object);
+        spoor_object_save(spoor_object);
+        spoor_object_print(spoor_object);
+        printf(":e ->>>>>>>> test\n");
+    }
     else if (memcmp(command_buffer->buffer, ":close", 6 * sizeof(*command_buffer->buffer)) == 0)
     {
         view_close(GlobalGraphic.views_index);

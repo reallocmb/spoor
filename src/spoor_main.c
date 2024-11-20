@@ -1,4 +1,7 @@
 #include"spoor.h"
+#include"s_redbas.c"
+#include"s_time.c"
+#include"s_object.c"
 #include"s_font.c"
 #include"s_render.c"
 #include"s_status_bar.c"
@@ -6,21 +9,7 @@
 #include"s_command_buffer.c"
 #include"s_xlib.c"
 #include"s_win32.c"
-
-void task_list_render_func(View *view)
-{
-    u16 x = view->x;
-    u16 y = view->y;
-#if 0
-    u16 width = view->width;
-    u16 height = view->height;
-#endif
-
-    u32 size = GlobalGraphic.font.size;
-    font_size_set(&GlobalGraphic.font, 15);
-    render_text(x + 50, y + GlobalGraphic.font.height, (u8 *)"Mein Name ist Matthias, was ist deiner?", 0xffaa33bb);
-    font_size_set(&GlobalGraphic.font, size);
-}
+#include"s_task_list.c"
 
 void render_func(void)
 {
@@ -62,6 +51,8 @@ void input_func(u8 key)
                             &GlobalGraphic.views_index,
                             VIEW_FLAG_HORIZONTAL,
                             view_default_render_func);
+                GlobalGraphic.views[GlobalGraphic.views_index].data = malloc(sizeof(TaskListData));
+                ((TaskListData *)GlobalGraphic.views[GlobalGraphic.views_index].data)->hand_index = 0;
             } break;
 
             default:
@@ -73,9 +64,15 @@ void input_func(u8 key)
 
         bool have_to_command_buffer_clear = true;
 
+        /* view input current index */
+        View *view_current = &GlobalGraphic.views[GlobalGraphic.views_index];
+        if (view_current->input_func != NULL)
+            view_current->input_func(view_current, key);
+
         if (strncmp((char *)GlobalGraphic.command_buffer.buffer + GlobalGraphic.command_buffer.count - 2, "lt", 2) == 0)
         {
             GlobalGraphic.views[GlobalGraphic.views_index].render_func = task_list_render_func;
+            GlobalGraphic.views[GlobalGraphic.views_index].input_func = task_list_input_func;
         }
         else if (strncmp((char *)GlobalGraphic.command_buffer.buffer + GlobalGraphic.command_buffer.count - 2, " s", 2) == 0)
         {
@@ -99,7 +96,6 @@ void input_func(u8 key)
         }
         else
             have_to_command_buffer_clear = false;
-
 
         if (have_to_command_buffer_clear)
             command_buffer_clear(&GlobalGraphic.command_buffer);
@@ -134,8 +130,9 @@ void input_func(u8 key)
 
 int main(void)
 {
-    printf("SOTT bytes %ld\n", sizeof(SOTT));
-    printf("SpoorObject bytes %ld\n", sizeof(SpoorObject));
+    printf("SOTT bytes %zd\n", sizeof(SOTT));
+    printf("SpoorObject bytes %zd\n", sizeof(SpoorObject));
+    printf("SOLink bytes %zd\n", sizeof(SOLink));
 
     GlobalGraphic.render_func = render_func;
     GlobalGraphic.input_func = input_func;
@@ -143,20 +140,33 @@ int main(void)
     //CONFIG_COLOR_BACKGROUND_SET(0xff883388);
     //CONFIG_GRAPHIC_SCALE_SET(2.1);
     
+#if 1
     CONFIG_STATUS_BAR_FONT_SIZE_SET(40);
     CONFIG_VIEW_FONT_SIZE_SET(12);
     CONFIG_VIEW_BORDER_SIZE_SET(1);
     CONFIG_VIEW_GAP_SIZE_SET(4);
-
-#if 0
-    font_load(&GlobalGraphic.font, "data/FreeMono.ttf", 25);
-#elif 1
-    font_load(&GlobalGraphic.font, "data/LiberationMono-Regular.ttf", CONFIG_STATUS_BAR_FONT_SIZE);
-#else
-    font_load(&GlobalGraphic.font, "data/Essays1743.ttf", 40);
 #endif
+
+    font_load(&GlobalGraphic.font, "data/LiberationMono-Regular.ttf", CONFIG_STATUS_BAR_FONT_SIZE);
     status_bar_init();
     views_init(&GlobalGraphic.views);
+
+    /* test */
+    SpoorTimeSpan spoor_time_span;
+    spoor_time_span_create(&spoor_time_span, "10m-12m", 7);
+    spoor_time_span_create(&spoor_time_span, "1m800-1000", 10);
+    spoor_time_span_create(&spoor_time_span, "5d-8d", 5);
+    spoor_time_span_create(&spoor_time_span, "12d700-900", 10);
+    spoor_time_span_create(&spoor_time_span, "-8d700-900", 10);
+    spoor_time_span_create(&spoor_time_span, "12d700-12d900", 13);
+    spoor_time_span_create(&spoor_time_span, "-8d700--8d900", 13);
+    spoor_time_span_create(&spoor_time_span, "8d700--8d900", 12);
+    spoor_time_span_create(&spoor_time_span, "700--8d900", 10);
+    spoor_time_span_create(&spoor_time_span, "700-8d900", 9);
+    spoor_time_span_create(&spoor_time_span, "700-900", 9);
+    /*
+    spoor_time_span_create(&spoor_time_span, "16.9.2024:800", 13);
+    */
 
     graphic_init();
     graphic_main_loop();

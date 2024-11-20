@@ -2,15 +2,15 @@
 #define S_CONFIG_H
 
 enum {
-    SPOOR_COLOR_BACKGROUND,
     SPOOR_COLOR_FOREGROUND,
+    SPOOR_COLOR_BACKGROUND,
 };
 
 #define CONFIG_COLOR_BACKGROUND config_colors[SPOOR_COLOR_BACKGROUND]
 #define CONFIG_COLOR_BACKGROUND_SET(color) config_colors[SPOOR_COLOR_BACKGROUND] = color
 
 #define CONFIG_COLOR_FOREGROUND config_colors[SPOOR_COLOR_FOREGROUND]
-#define CONFIG_COLOR_FOREGROUND_SET(color) config_colors[SPOOR_COLOR_BACKGROUND] = color
+#define CONFIG_COLOR_FOREGROUND_SET(color) config_colors[SPOOR_COLOR_FOREGROUND] = color
 
 u32 config_colors[] = {
     0xff0c0c0c,
@@ -22,8 +22,8 @@ enum {
     SPOOR_STATUS_BAR_HEIGHT,
     SPOOR_STATUS_BAR_PADDING,
     SPOOR_STATUS_BAR_FONT_SIZE,
-    SPOOR_COLOR_STATUS_BAR_BACKGROUND,
     SPOOR_COLOR_STATUS_BAR_FOREGROUND,
+    SPOOR_COLOR_STATUS_BAR_BACKGROUND,
 };
 
 #define CONFIG_STATUS_BAR_HEIGHT config_status_bar[SPOOR_STATUS_BAR_HEIGHT]
@@ -45,8 +45,8 @@ u32 config_status_bar[] = {
     30,
     2,
     40,
-    0x11a08563,
-    0xffa08563,
+    0xff0c0c0c,
+    0x440c0c0c,
 };
 
 enum {
@@ -85,6 +85,13 @@ u32 config_view[] = {
     10,
     0xffffffff,
     15,
+};
+
+/* status colors */
+const u32 CONFIG_COLOR_STATUS[3] = {
+    0xff551100,
+    0xff887722,
+    0xff228811,
 };
 
 #endif

@@ -58,6 +58,8 @@ typedef struct View {
     u16 parent_id;
     u16 childs_count;
     void (*render_func)(struct View *view); /* void *graphic => Graphic *graphic */
+    void (*input_func)(struct View *view, u8 key);
+    void *data;
 #endif /* todo(mb) */
 } View;
 
@@ -122,7 +124,28 @@ enum {
     SPOOR_TYPE_APPOINTMENT,
     SPOOR_TYPE_GOAL,
     SPOOR_TYPE_HABIT,
+    SPOOR_TYPE_IDEA,
 };
+
+const char SPOOR_STATUS[3][25] = {
+    "NOT STARTED",
+    "IN PROGRESS",
+    "COMPLETED"
+};
+
+const char SPOOR_TYPES[7][23] = {
+    "TASK",
+    "PROJECT",
+    "EVENT",
+    "APPOINTMENT",
+    "GOAL",
+    "HABIT",
+    "IDEA"
+};
+
+#define SPOOR_TIME_DEFAULT_VALUE 0xffffffff
+
+#define SPOOR_OBJECT_ID_DELETED 0xffffffff
 
 typedef struct SpoorTime {
     s32 sec;
@@ -138,20 +161,30 @@ typedef struct SpoorTimeSpan {
     SpoorTime end;
 } SpoorTimeSpan; // 48 bytes
 
+typedef struct SOLink {
+    u32 id;
+    u32 link_ids[120];
+    u32 link_ids_count;
+    u32 id_prev;
+    u32 id_next;
+} SOLink;
+
 typedef struct SOTT {
     u32 id; // 4 bytes
-    u32 flags; // 4 bytes
     SpoorTimeSpan time_spans[10]; // 10 * 48 bytes = 480
     u32 time_spans_count; // 4 bytes
     u32 id_prev; // 4 bytes
     u32 id_next; // 4 bytes
 } SOTT; // 496 bytes
         
-#define SPOOR_OBJECT_TITLE_SIZE_MAX 244
+#define SPOOR_OBJECT_TITLE_SIZE_MAX 240
+#define SPOOR_OBJECT_NO_PARENT_ID 0xffffffff
+#define SPOOR_OBJECT_NO_ID 0xffffffff
+#define SPOOR_OBJECT_FREE_ID 0xfffffffe
 
 typedef struct SpoorObject {
     u32 id; // 4 bytes
-    u32 flags; // 4 bytes
+    u32 id_parent; // 4 bytes
     char title[SPOOR_OBJECT_TITLE_SIZE_MAX]; //  250
     SpoorTimeSpan deadline; // 48 bytes
     SpoorTimeSpan schedule; // 48 bytes
@@ -162,5 +195,17 @@ typedef struct SpoorObject {
     u8 status; // 1 byte
     u8 type; // 1 byte
 } SpoorObject; // 500 bytes
+
+#define TASK_LIST_HAND_INDEX_DEFAULT 0xffffffff
+
+typedef struct Data {
+    SpoorObject *spoor_objects;
+    u32 index;
+} Data;
+
+typedef struct TaskListData {
+    SpoorObject *spoor_objects;
+    u32 hand_index;
+} TaskListData;
 
 #endif

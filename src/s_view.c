@@ -199,6 +199,7 @@ void view_append(View **head,
         views[0].parent_id = VIEW_NO_PARENT;
         views[0].childs_count = 0;
         views[0].render_func = render_func;
+        views[0].input_func = NULL;
 
         *views_index = 0;
         (*views_count)++;
@@ -223,6 +224,7 @@ void view_append(View **head,
         child1->parent_id = parent->id;
         child1->childs_count = 0;
         child1->render_func = render_func;
+        child1->input_func = NULL;
 
         parent->childs_count = 2;
         parent->flags = VIEW_FLAG_PARENT | flags;
@@ -251,6 +253,7 @@ void view_append(View **head,
         child1->parent_id = parent->id;
         child1->childs_count = 0;
         child1->render_func = render_func;
+        child1->input_func = NULL;
 
         parent->childs_count = 2;
         parent->flags |= VIEW_FLAG_PARENT;
@@ -275,6 +278,7 @@ void view_append(View **head,
         child0->parent_id = parent->id;
         child0->childs_count = 0;
         child0->render_func = render_func;
+        child0->input_func = NULL;
 
         parent->childs_count++;
 

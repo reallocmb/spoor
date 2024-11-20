@@ -1,0 +1,52 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34511.84
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{911E67C6-3D85-4FCE-B560-20A9C3E3FF48}") = "spoor_main", "bin\spoor_main.exe", "{E5FDCA1F-E2BB-46E7-A087-2A57DE439F0E}"
+	ProjectSection(DebuggerProjectSystem) = preProject
+		PortSupplier = 00000000-0000-0000-0000-000000000000
+		Executable = S:\bin\spoor_main.exe
+		RemoteMachine = REKENAAR
+		StartingDirectory = S:\
+		Environment = Standard
+		LaunchingEngine = 00000000-0000-0000-0000-000000000000
+		UseLegacyDebugEngines = No
+		LaunchSQLEngine = No
+		AttachLaunchAction = No
+		IORedirection = Auto
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Projektmappenelemente", "Projektmappenelemente", "{99758A26-DCAC-4CC1-A1F3-F74E78F25CFE}"
+	ProjectSection(SolutionItems) = preProject
+		src\spoor.h = src\spoor.h
+		src\spoor_main.c = src\spoor_main.c
+		src\s_commands.h = src\s_commands.h
+		src\s_command_buffer.c = src\s_command_buffer.c
+		src\s_config.h = src\s_config.h
+		src\s_font.c = src\s_font.c
+		src\s_input.h = src\s_input.h
+		src\s_object.c = src\s_object.c
+		src\s_redbas.c = src\s_redbas.c
+		src\s_render.c = src\s_render.c
+		src\s_status_bar.c = src\s_status_bar.c
+		src\s_types.h = src\s_types.h
+		src\s_view.c = src\s_view.c
+		src\s_win32.c = src\s_win32.c
+		src\s_xlib.c = src\s_xlib.c
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E5FDCA1F-E2BB-46E7-A087-2A57DE439F0E}.Release|x64.ActiveCfg = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EFF226F6-2DD6-4E83-8660-881ED837E15B}
+	EndGlobalSection
+EndGlobal
