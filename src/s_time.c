@@ -143,7 +143,6 @@ enum {
 
 void spoor_time_span_create(SpoorTimeSpan *spoor_time_span, char *argument, u32 argument_length)
 {
-    printf("Argument %s\n", argument);
     time_t time_start = time(NULL);
     time_t time_end = time_start;
 
@@ -223,12 +222,6 @@ void spoor_time_span_create(SpoorTimeSpan *spoor_time_span, char *argument, u32 
         }
     }
 
-    printf("value: %d\n", value);
-    printf("mode_values[0]: %d\n", mode_values[0]);
-    printf("mode_values[1]: %d\n", mode_values[1]);
-    printf("time_values[0]: %d\n", time_values[0]);
-    printf("time_values[1]: %d\n", time_values[1]);
-
     /* time start */
     /* mode */
     switch (modes[0])
@@ -302,6 +295,25 @@ void spoor_time_span_create(SpoorTimeSpan *spoor_time_span, char *argument, u32 
     spoor_time_span->start.mon += 1;
     spoor_time_span->end.year += 1900;
     spoor_time_span->end.mon += 1;
+}
 
-    spoor_time_span_print(spoor_time_span, "spoor_time_span_create test()");
+u32 time_compare(SpoorTime *time0, SpoorTime *time1)
+{
+    u32 time0_sum = time0->min +
+        (time0->hour * 60) +
+        (time0->day * 60 * 24) +
+        (time0->mon * 60 * 24 * 31) +
+        (time0->year * 60 * 24 * 31 * 12);
+    u32 time1_sum = time1->min +
+        (time1->hour * 60) +
+        (time1->day * 60 * 24) +
+        (time1->mon * 60 * 24 * 31) +
+        (time1->year * 60 * 24 * 31 * 12);
+
+    return time0_sum - time1_sum;
+}
+
+u32 time_span_compare(SpoorTimeSpan *time_span0, SpoorTimeSpan *time_span1)
+{
+    return 0;
 }

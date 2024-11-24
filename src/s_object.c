@@ -1,5 +1,4 @@
 #include<math.h>
-#include <string.h>
 #include"spoor.h"
 
 u32 argument_next(char **arguments, u32 arguments_last_length)
@@ -19,8 +18,6 @@ u32 argument_next(char **arguments, u32 arguments_last_length)
 
 void spoor_object_create(SpoorObject *spoor_object, char *arguments, u32 arguments_size, SpoorObject *spoor_object_old)
 {
-    printf("arguments: '%s'\ncount: %d\n\n", arguments, arguments_size);
-
     /* remove space */
     while (*arguments == ' ')
         arguments++;
@@ -37,7 +34,10 @@ void spoor_object_create(SpoorObject *spoor_object, char *arguments, u32 argumen
             i++;
         }
         spoor_object->title[i] = 0;
+        arguments++;
     }
+    if (*arguments == ' ')
+        arguments++;
 #if 0
     u32 i;
     for (i = 0; arguments[i] != ',' && i < SPOOR_OBJECT_TITLE_SIZE_MAX - 1; i++)
@@ -46,19 +46,23 @@ void spoor_object_create(SpoorObject *spoor_object, char *arguments, u32 argumen
     arguments += i + 1;
 #endif
 
-    /* initial spoor object's values */
-    if (spoor_object_old == NULL)
-    {
-        memset(&spoor_object->deadline, SPOOR_TIME_DEFAULT_VALUE, sizeof(spoor_object->deadline));
-        memset(&spoor_object->schedule, SPOOR_TIME_DEFAULT_VALUE, sizeof(spoor_object->schedule));
-    }
-
     SpoorTimeSpan *spoor_time_span = &spoor_object->deadline;
 
     u8 type;
     u8 status;
     if (spoor_object_old == NULL)
     {
+        /* init values */
+        memset(&spoor_object->deadline, SPOOR_TIME_DEFAULT_VALUE, sizeof(spoor_object->deadline));
+        memset(&spoor_object->schedule, SPOOR_TIME_DEFAULT_VALUE, sizeof(spoor_object->schedule));
+
+        spoor_object->id = SPOOR_OBJECT_NO_ID;
+        spoor_object->id_parent = SPOOR_OBJECT_NO_PARENT_ID;
+        spoor_object->schedule_id_next = 0;
+        memset(&spoor_object->tracked, SPOOR_TIME_DEFAULT_VALUE, sizeof(spoor_object->tracked));
+        memset(&spoor_object->complete, SPOOR_TIME_DEFAULT_VALUE, sizeof(spoor_object->complete));
+        memset(&spoor_object->created, SPOOR_TIME_DEFAULT_VALUE, sizeof(spoor_object->created));
+
         type = SPOOR_TYPE_TASK;
         status = SPOOR_STATUS_NOT_STARTED;
     }
@@ -101,17 +105,6 @@ void spoor_object_create(SpoorObject *spoor_object, char *arguments, u32 argumen
         }
     }
 
-    /* handle other argumentss */
-
-    if (spoor_object_old == NULL)
-    {
-        spoor_object->id = SPOOR_OBJECT_NO_ID;
-        spoor_object->id_parent = SPOOR_OBJECT_NO_PARENT_ID;
-        spoor_object->schedule_id_next = 0;
-        memset(&spoor_object->tracked, SPOOR_TIME_DEFAULT_VALUE, sizeof(spoor_object->tracked));
-        memset(&spoor_object->complete, SPOOR_TIME_DEFAULT_VALUE, sizeof(spoor_object->complete));
-        memset(&spoor_object->created, SPOOR_TIME_DEFAULT_VALUE, sizeof(spoor_object->created));
-    }
     spoor_object->status = status;
     spoor_object->type = type;
 }
@@ -187,8 +180,6 @@ u32 spoor_object_load(SpoorObject **spoor_objects)
     {
         redbas_db_restore_cursor_set(db, i);
         redbas_db_restore(db, &(*spoor_objects)[k], sizeof(**spoor_objects));
-        printf("id: %d == %d\n", (*spoor_objects)[k].id, SPOOR_OBJECT_ID_DELETED);
-        spoor_object_print(&(*spoor_objects)[k]);
         if ((*spoor_objects)[k].id != SPOOR_OBJECT_ID_DELETED)
             k++;
     }
@@ -196,4 +187,9 @@ u32 spoor_object_load(SpoorObject **spoor_objects)
     redbas_db_close(db);
 
     return k;
+}
+
+void spoor_object_sort(SpoorObject *spoor_objects, u32 spoor_objects_count)
+{
+    qsort(spoor_objects, spoor_objects_count, sizeof(*spoor_objects), sort_func);
 }

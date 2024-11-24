@@ -19,7 +19,7 @@ void view_border_render(View *view)
     height -= CONFIG_VIEW_GAP_SIZE * 2;
 
 
-    u32 color = CONFIG_COLOR_FOREGROUND;
+    u32 color = 0xff555555;
     if (view - GlobalGraphic.views == GlobalGraphic.views_index)
         color = CONFIG_VIEW_BORDER_COLOR;
 

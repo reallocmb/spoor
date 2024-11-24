@@ -87,8 +87,8 @@ struct Graphic {
 #endif
 } GlobalGraphic = {
     .running = true,
-    .width = 800,
-    .height = 600,
+    .width = 1200,
+    .height = 800,
     .pixels = NULL,
     .pixels_count = 0,
     .command_buffer = {

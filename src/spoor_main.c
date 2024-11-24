@@ -1,6 +1,7 @@
 #include"spoor.h"
 #include"s_redbas.c"
 #include"s_time.c"
+#include"s_sort.c"
 #include"s_object.c"
 #include"s_font.c"
 #include"s_render.c"
@@ -10,6 +11,7 @@
 #include"s_xlib.c"
 #include"s_win32.c"
 #include"s_task_list.c"
+#include"s_calendar.c"
 
 void render_func(void)
 {
@@ -19,7 +21,6 @@ void render_func(void)
 
 void input_func(u8 key)
 {
-    printf("input -> char %c\n", key);
     if (GlobalGraphic.mode == GRAPHIC_MODE_NORMAL)
     {
         switch (key)
@@ -34,18 +35,17 @@ void input_func(u8 key)
 
             case SPOOR_INPUT_ASCII_KEY_CONTROL_S:
             {
-                printf("view append vertical\n");
                 view_append(&GlobalGraphic.views,
                             &GlobalGraphic.views_count,
                             &GlobalGraphic.views_index,
                             VIEW_FLAG_VERTICAL,
                             view_default_render_func);
-
+                GlobalGraphic.views[GlobalGraphic.views_index].data = malloc(sizeof(TaskListData));
+                ((Data *)GlobalGraphic.views[GlobalGraphic.views_index].data)->index = 0;
             } break;
 
             case SPOOR_INPUT_ASCII_KEY_CONTROL_H:
             {
-                printf("view append horizontal\n");
                 view_append(&GlobalGraphic.views,
                             &GlobalGraphic.views_count,
                             &GlobalGraphic.views_index,
@@ -74,24 +74,25 @@ void input_func(u8 key)
             GlobalGraphic.views[GlobalGraphic.views_index].render_func = task_list_render_func;
             GlobalGraphic.views[GlobalGraphic.views_index].input_func = task_list_input_func;
         }
+        else if (strncmp((char *)GlobalGraphic.command_buffer.buffer + GlobalGraphic.command_buffer.count - 2, "lc", 2) == 0)
+        {
+            GlobalGraphic.views[GlobalGraphic.views_index].render_func = calendar_render_func;
+            GlobalGraphic.views[GlobalGraphic.views_index].input_func = calendar_input_func;
+        }
         else if (strncmp((char *)GlobalGraphic.command_buffer.buffer + GlobalGraphic.command_buffer.count - 2, " s", 2) == 0)
         {
-            printf("wind left...\n");
             view_focus_left(&GlobalGraphic.views_index);
         }
         else if (strncmp((char *)GlobalGraphic.command_buffer.buffer + GlobalGraphic.command_buffer.count - 2, " n", 2) == 0)
         {
-            printf("wind down...\n");
             view_focus_down(&GlobalGraphic.views_index);
         }
         else if (strncmp((char *)GlobalGraphic.command_buffer.buffer + GlobalGraphic.command_buffer.count - 2, " r", 2) == 0)
         {
-            printf("wind up...\n");
             view_focus_up(&GlobalGraphic.views_index);
         }
         else if (strncmp((char *)GlobalGraphic.command_buffer.buffer + GlobalGraphic.command_buffer.count - 2, " t", 2) == 0)
         {
-            printf("wind right...\n");
             view_focus_right(&GlobalGraphic.views_index);
         }
         else
@@ -117,7 +118,6 @@ void input_func(u8 key)
             
             case 0:
             {
-                printf("000000\n");
             } break;
 
             default:
@@ -128,22 +128,13 @@ void input_func(u8 key)
         }
     }
 
-    printf("Key Pressed: %d\n", key);
-
     graphic_update();
 }
 
 int main(void)
 {
-    printf("SOTT bytes %zd\n", sizeof(SOTT));
-    printf("SpoorObject bytes %zd\n", sizeof(SpoorObject));
-    printf("SOLink bytes %zd\n", sizeof(SOLink));
-
     GlobalGraphic.render_func = render_func;
     GlobalGraphic.input_func = input_func;
-
-    //CONFIG_COLOR_BACKGROUND_SET(0xff883388);
-    //CONFIG_GRAPHIC_SCALE_SET(2.1);
     
 #if 1
     CONFIG_STATUS_BAR_FONT_SIZE_SET(40);
@@ -156,24 +147,33 @@ int main(void)
     status_bar_init();
     views_init(&GlobalGraphic.views);
 
-    /* test */
-    SpoorTimeSpan spoor_time_span;
-    spoor_time_span_create(&spoor_time_span, "10m-12m", 7);
-    spoor_time_span_create(&spoor_time_span, "1m800-1000", 10);
-    spoor_time_span_create(&spoor_time_span, "5d-8d", 5);
-    spoor_time_span_create(&spoor_time_span, "12d700-900", 10);
-    spoor_time_span_create(&spoor_time_span, "-8d700-900", 10);
-    spoor_time_span_create(&spoor_time_span, "12d700-12d900", 13);
-    spoor_time_span_create(&spoor_time_span, "-8d700--8d900", 13);
-    spoor_time_span_create(&spoor_time_span, "8d700--8d900", 12);
-    spoor_time_span_create(&spoor_time_span, "700--8d900", 10);
-    spoor_time_span_create(&spoor_time_span, "700-8d900", 9);
-    spoor_time_span_create(&spoor_time_span, "700-900", 9);
-    /*
-    spoor_time_span_create(&spoor_time_span, "16.9.2024:800", 13);
-    */
-
     graphic_init();
+
+    /* remove after */
+#if 0
+    view_append(&GlobalGraphic.views,
+                &GlobalGraphic.views_count,
+                &GlobalGraphic.views_index,
+                VIEW_FLAG_VERTICAL,
+                view_default_render_func);
+    GlobalGraphic.views[GlobalGraphic.views_index].data = malloc(sizeof(TaskListData));
+    ((Data *)GlobalGraphic.views[GlobalGraphic.views_index].data)->index = 0;
+
+    GlobalGraphic.views[GlobalGraphic.views_index].render_func = task_list_render_func;
+    GlobalGraphic.views[GlobalGraphic.views_index].input_func = task_list_input_func;
+#endif
+
+    view_append(&GlobalGraphic.views,
+                &GlobalGraphic.views_count,
+                &GlobalGraphic.views_index,
+                VIEW_FLAG_HORIZONTAL,
+                view_default_render_func);
+    GlobalGraphic.views[GlobalGraphic.views_index].data = malloc(sizeof(TaskListData));
+    ((Data *)GlobalGraphic.views[GlobalGraphic.views_index].data)->index = 0;
+
+    GlobalGraphic.views[GlobalGraphic.views_index].render_func = calendar_render_func;
+    GlobalGraphic.views[GlobalGraphic.views_index].input_func = calendar_input_func;
+
     graphic_main_loop();
     
     return 0;

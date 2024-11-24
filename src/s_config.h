@@ -13,8 +13,12 @@ enum {
 #define CONFIG_COLOR_FOREGROUND_SET(color) config_colors[SPOOR_COLOR_FOREGROUND] = color
 
 u32 config_colors[] = {
+    0xffffffff,
+    0xff105020,
+    /*
     0xff0c0c0c,
     0xffa08563,
+    */
 };
 
 /* CONFIG STATUS BAR */
@@ -45,8 +49,12 @@ u32 config_status_bar[] = {
     30,
     2,
     40,
+    0xff000000,
+    0x22000000,
+    /*
     0xff0c0c0c,
     0x440c0c0c,
+    */
 };
 
 enum {

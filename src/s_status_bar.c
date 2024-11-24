@@ -7,7 +7,6 @@ void status_bar_init(void)
 
 void status_bar_render_func(void)
 {
-    printf("CONFIG_STATUS_BAR_HEIGHT: %d\n", CONFIG_STATUS_BAR_HEIGHT);
     u16 height = CONFIG_STATUS_BAR_HEIGHT;
     u16 y = GlobalGraphic.height - height;
 

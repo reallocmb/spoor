@@ -6,7 +6,6 @@
 #define win32_graphic_update graphic_update
 void win32_graphic_update(void)
 {
-    printf("graphic_update()\n");
     u32 i;
     for (i = 0; i < GlobalGraphic.pixels_count; i++)
         GlobalGraphic.pixels[i] = CONFIG_COLOR_BACKGROUND;
@@ -44,7 +43,6 @@ LRESULT main_wndproc(HWND window,
     {
         case WM_SIZE:
         {
-            printf("wm_size\n");
             OutputDebugStringA("WM_SIZE\n");
             RECT window_size;
             GetClientRect(window, &window_size);
@@ -63,7 +61,6 @@ LRESULT main_wndproc(HWND window,
         {
             PAINTSTRUCT paint;
             GlobalGraphic.device_context = BeginPaint(window, &paint);
-            printf("wm_paint\n");
             OutputDebugStringA("WM_PAINT\n");
             graphic_update();
             EndPaint(window, &paint);
@@ -71,18 +68,15 @@ LRESULT main_wndproc(HWND window,
 
         case WM_CHAR:
         {
-            printf("wm_char: %c\n", (char)w_param);
             GlobalGraphic.input_func((u8)w_param);
         } break;
 
         case WM_SYSKEYDOWN:
         {
-            printf("syskeydown: %lld\n", w_param);
         } break;
 
         case WM_KEYDOWN:
         {
-            printf("keydown: %lld\n", w_param);
         } break;
         
         case WM_DESTROY:

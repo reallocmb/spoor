@@ -130,6 +130,64 @@ u32 utf8_decode(const u8 *str, u32 *i) /* todo(mb) rewrite it plese */
     return c;
 }
 
+void view_render_text(View *view,
+                      u16 x,
+                      u16 y,
+                      const u8 *text,
+                      u32 color)
+{
+    FT_GlyphSlot slot = GlobalGraphic.font.face->glyph;
+    u16 pen_x, pen_y;
+
+#if 0 /* todo(mb) remove ? */
+    u16 height = (GlobalGraphic.font.face->size->metrics.ascender >> 6) - (GlobalGraphic.font.face->size->metrics.descender >> 6);
+    render_rectangle(x, y - height - (GlobalGraphic.font.face->size->metrics.descender >> 6), 100, height, 0xffaa2266); /* todo remove? */
+#endif
+
+    pen_x = x;
+    pen_y = y;
+
+    u32 i;
+    for (i = 0; i < text[i]; i++)
+    {
+        FT_ULong glyph_index = FT_Get_Char_Index(GlobalGraphic.font.face, utf8_decode(text, &i));
+
+        FT_Load_Glyph(GlobalGraphic.font.face, glyph_index, FT_LOAD_DEFAULT);
+
+        FT_Render_Glyph(GlobalGraphic.font.face->glyph, FT_RENDER_MODE_NORMAL);
+
+        /* todo(mb) read the freetype tutorial*/
+
+        u16 x = pen_x + slot->bitmap_left;
+        u16 y = pen_y - slot->bitmap_top;
+
+        u16 rows;
+        u16 cols;
+
+        u16 slot_pitch = slot->bitmap.pitch;
+        if ((x - view->x) + slot_pitch >= view->width)
+        {
+#if 0
+            slot_pitch -= view->width - (x - view->x); /* for mor accuracy maybe? */
+#endif
+            return;
+        }
+
+        for (rows = 0; rows < slot->bitmap.rows; rows++)
+        {
+            for (cols = 0; cols < slot_pitch; cols++)
+            {
+                u32 bitmap_alpha = slot->bitmap.buffer[rows * slot->bitmap.pitch + cols];
+                u32 pixels_count = (y + rows) * GlobalGraphic.width + (x + cols);
+                GlobalGraphic.pixels[pixels_count] = color_alpha_blend(color,
+                                                                  GlobalGraphic.pixels[pixels_count],
+                                                                  bitmap_alpha);
+            }
+        }
+        pen_x += slot->advance.x >> 6;
+    }
+}
+
 void render_text(u16 x,
                  u16 y,
                  const u8 *text,
