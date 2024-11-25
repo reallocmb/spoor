@@ -52,19 +52,19 @@ void calendar_render_func(View *view)
 
         struct tm *today_date = localtime(&today_sec);
         
-        u32 text_length = font_text_width_in_pixels(&GlobalGraphic.font, DAYS_NAME[0]);
+        u32 text_length = font_text_width_in_pixels(&GlobalGraphic.font, (u8 *)DAYS_NAME[0]);
         /* week days */
         char today_date_buffer[11];
             spoor_time_date_format_create((SpoorTime *)today_date, today_date_buffer);
         if (time_compare(&today, (SpoorTime *)today_date) == 0)
         {
-            view_render_text(view, x + 10, text_day_y, DAYS_NAME[today_date->tm_wday], 0xccffffff);
-            view_render_text(view, x + 10, text_date_y, today_date_buffer, 0xccffffff);
+            view_render_text(view, x + 10, text_day_y, (u8 *)DAYS_NAME[today_date->tm_wday], 0xccffffff);
+            view_render_text(view, x + 10, text_date_y, (u8 *)today_date_buffer, 0xccffffff);
         }
         else
         {
-            view_render_text(view, x + 10, text_day_y, DAYS_NAME[today_date->tm_wday], CONFIG_COLOR_FOREGROUND);
-            view_render_text(view, x + 10, text_date_y, today_date_buffer, CONFIG_COLOR_FOREGROUND);
+            view_render_text(view, x + 10, text_day_y, (u8 *)DAYS_NAME[today_date->tm_wday], CONFIG_COLOR_FOREGROUND);
+            view_render_text(view, x + 10, text_date_y, (u8 *)today_date_buffer, CONFIG_COLOR_FOREGROUND);
         }
         /* date */
 
@@ -79,7 +79,7 @@ void calendar_render_func(View *view)
             {
                 char time_buffer[6];
                 sprintf(time_buffer, "%s%i:00", ((i / 60) + data->time_offset  > 9) ?"" :"0", (i / 60) + data->time_offset);
-                view_render_text(view, x + 5, y + GlobalGraphic.font.height, time_buffer, CONFIG_COLOR_FOREGROUND);
+                view_render_text(view, x + 5, y + GlobalGraphic.font.height, (u8 *)time_buffer, CONFIG_COLOR_FOREGROUND);
                 render_line_horizontal(x, y, day_width, 0xccaaaaaa);
             }
             else if (i % 5 == 0)
