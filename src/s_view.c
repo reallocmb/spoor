@@ -56,9 +56,6 @@ void view_default_render_func(View *view)
 #endif
 
     u32 size = font->size;
-#if 1
-    font_size_set(font, CONFIG_VIEW_FONT_SIZE);
-#endif
 
     x += 10;
     y += font->height;

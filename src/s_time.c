@@ -11,9 +11,6 @@ void spoor_time_format_append(char *buffer, u32 *buffer_i, s32 value, u32 digit_
     }
     else
     {
-
-
-
         u32 digit;
         u32 count = digit_count;
         while (count--)
@@ -26,6 +23,17 @@ void spoor_time_format_append(char *buffer, u32 *buffer_i, s32 value, u32 digit_
 
         *buffer_i += digit_count;
     }
+}
+
+void spoor_time_date_format_create(SpoorTime *spoor_time, char *buffer) 
+{
+    u32 buffer_i = 0;
+    spoor_time_format_append(buffer, &buffer_i, spoor_time->day, 2);
+    buffer[buffer_i++] = '.';
+    spoor_time_format_append(buffer, &buffer_i, spoor_time->mon, 2);
+    buffer[buffer_i++] = '.';
+    spoor_time_format_append(buffer, &buffer_i, spoor_time->year, 4);
+    buffer[buffer_i] = 0;
 }
 
 /* buffer 17 bytes */
@@ -297,7 +305,7 @@ void spoor_time_span_create(SpoorTimeSpan *spoor_time_span, char *argument, u32 
     spoor_time_span->end.mon += 1;
 }
 
-u32 time_compare(SpoorTime *time0, SpoorTime *time1)
+s32 time_compare(SpoorTime *time0, SpoorTime *time1)
 {
     u32 time0_sum = time0->min +
         (time0->hour * 60) +

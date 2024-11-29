@@ -136,14 +136,12 @@ int main(void)
     GlobalGraphic.render_func = render_func;
     GlobalGraphic.input_func = input_func;
     
-#if 1
-    CONFIG_STATUS_BAR_FONT_SIZE_SET(40);
-    CONFIG_VIEW_FONT_SIZE_SET(12);
-    CONFIG_VIEW_BORDER_SIZE_SET(1);
+#if 0
+    CONFIG_VIEW_BORDER_SIZE_SET(2);
     CONFIG_VIEW_GAP_SIZE_SET(4);
 #endif
 
-    font_load(&GlobalGraphic.font, "data/LiberationMono-Regular.ttf", CONFIG_STATUS_BAR_FONT_SIZE);
+    font_load(&GlobalGraphic.font, "data/LiberationMono-Regular.ttf", CONFIG_DEFAULT_FONT_SIZE);
     status_bar_init();
     views_init(&GlobalGraphic.views);
 
@@ -163,16 +161,21 @@ int main(void)
     GlobalGraphic.views[GlobalGraphic.views_index].input_func = task_list_input_func;
 #endif
 
+#if 1
     view_append(&GlobalGraphic.views,
                 &GlobalGraphic.views_count,
                 &GlobalGraphic.views_index,
                 VIEW_FLAG_HORIZONTAL,
                 view_default_render_func);
-    GlobalGraphic.views[GlobalGraphic.views_index].data = malloc(sizeof(TaskListData));
+    GlobalGraphic.views[GlobalGraphic.views_index].data = malloc(sizeof(CalendarData));
     ((Data *)GlobalGraphic.views[GlobalGraphic.views_index].data)->index = 0;
+    ((CalendarData *)GlobalGraphic.views[GlobalGraphic.views_index].data)->days_count = 5;
+    ((CalendarData *)GlobalGraphic.views[GlobalGraphic.views_index].data)->time_offset = 8;
+    ((CalendarData *)GlobalGraphic.views[GlobalGraphic.views_index].data)->date_offset = 0;
 
     GlobalGraphic.views[GlobalGraphic.views_index].render_func = calendar_render_func;
     GlobalGraphic.views[GlobalGraphic.views_index].input_func = calendar_input_func;
+#endif
 
     graphic_main_loop();
     

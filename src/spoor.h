@@ -208,4 +208,14 @@ typedef struct TaskListData {
     u32 hand_index;
 } TaskListData;
 
+#define DAY_SECONDS 86400
+
+typedef struct CalendarData {
+    SpoorObject *spoor_objects;
+    u32 index;
+    u32 days_count;
+    u32 time_offset;
+    s32 date_offset;
+} CalendarData;
+
 #endif

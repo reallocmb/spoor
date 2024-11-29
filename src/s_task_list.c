@@ -17,8 +17,10 @@ void task_list_render_func(View *view)
     u16 height = view->height;
 #endif
 
+#if 0
     u32 size = GlobalGraphic.font.size;
     font_size_set(&GlobalGraphic.font, 15);
+#endif
 
     /* hand highlight */
     if (task_list_data->hand_index >= spoor_objects_count)
@@ -71,7 +73,9 @@ void task_list_render_func(View *view)
         y += GlobalGraphic.font.height;
     }
 
+#if 0
     font_size_set(&GlobalGraphic.font, size);
+#endif
 }
 
 void task_list_input_func(View *view, u8 key)

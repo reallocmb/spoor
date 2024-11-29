@@ -21,3 +21,10 @@ void font_load(SpoorFont *font, const char *path, u32 size)
 
     font_size_set(font, size);
 }
+
+u32 font_text_width_in_pixels(SpoorFont *font, const u8 *text)
+{
+    u32 text_length;
+    for (text_length = 0; text[text_length] != 0; text_length++) { }
+    return (font->face->size->metrics.max_advance >> 6) * text_length;
+}

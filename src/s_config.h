@@ -2,6 +2,17 @@
 #define S_CONFIG_H
 
 enum {
+    SPOOR_DEFAULT_FONT_SIZE,
+};
+
+#define CONFIG_DEFAULT_FONT_SIZE config_font_sizes[SPOOR_DEFAULT_FONT_SIZE]
+#define CONFIG_DEFAULT_FONT_SIZE_SET(font_size) config_font_sizes[SPOOR_DEFAULT_FONT_SIZE] = font_size
+
+u32 config_font_sizes[] = {
+    13
+};
+
+enum {
     SPOOR_COLOR_FOREGROUND,
     SPOOR_COLOR_BACKGROUND,
 };
@@ -13,19 +24,14 @@ enum {
 #define CONFIG_COLOR_FOREGROUND_SET(color) config_colors[SPOOR_COLOR_FOREGROUND] = color
 
 u32 config_colors[] = {
-    0xffffffff,
-    0xff105020,
-    /*
-    0xff0c0c0c,
-    0xffa08563,
-    */
+    0xff000000,
+    0xff957D95
 };
 
 /* CONFIG STATUS BAR */
 enum {
     SPOOR_STATUS_BAR_HEIGHT,
     SPOOR_STATUS_BAR_PADDING,
-    SPOOR_STATUS_BAR_FONT_SIZE,
     SPOOR_COLOR_STATUS_BAR_FOREGROUND,
     SPOOR_COLOR_STATUS_BAR_BACKGROUND,
 };
@@ -36,9 +42,6 @@ enum {
 #define CONFIG_STATUS_BAR_PADDING config_status_bar[SPOOR_STATUS_BAR_PADDING]
 #define CONFIG_STATUS_BAR_PADDING_SET(padding) config_status_bar[SPOOR_STATUS_BAR_PADDING] = padding
 
-#define CONFIG_STATUS_BAR_FONT_SIZE config_status_bar[SPOOR_STATUS_BAR_FONT_SIZE]
-#define CONFIG_STATUS_BAR_FONT_SIZE_SET(font_size) config_status_bar[SPOOR_STATUS_BAR_FONT_SIZE] = font_size
-
 #define CONFIG_COLOR_STATUS_BAR_BACKGROUND config_status_bar[SPOOR_COLOR_STATUS_BAR_BACKGROUND]
 #define CONFIG_COLOR_STATUS_BAR_BACKGROUND_SET(color) config_status_bar[COLOR_STATUS_BAR_BACKGROUND] = color
 
@@ -48,13 +51,8 @@ enum {
 u32 config_status_bar[] = {
     30,
     2,
-    40,
     0xff000000,
-    0x22000000,
-    /*
-    0xff0c0c0c,
-    0x440c0c0c,
-    */
+    0x33000000,
 };
 
 enum {
@@ -73,7 +71,6 @@ enum {
     SPOOR_VIEW_BORDER_SIZE,
     SPOOR_VIEW_GAP_SIZE,
     SPOOR_VIEW_BORDER_COLOR,
-    SPOOR_VIEW_FONT_SIZE,
 };
 
 #define CONFIG_VIEW_BORDER_SIZE config_view[SPOOR_VIEW_BORDER_SIZE]
@@ -85,14 +82,10 @@ enum {
 #define CONFIG_VIEW_BORDER_COLOR config_view[SPOOR_VIEW_BORDER_COLOR]
 #define CONFIG_VIEW_BORDER_COLOR_SET(border_color) config_view[SPOOR_VIEW_BORDER_COLOR] = border_color
 
-#define CONFIG_VIEW_FONT_SIZE config_view[SPOOR_VIEW_FONT_SIZE]
-#define CONFIG_VIEW_FONT_SIZE_SET(font_size) config_view[SPOOR_VIEW_FONT_SIZE] = font_size
-
 u32 config_view[] = {
     2,
-    10,
+    4,
     0xffffffff,
-    15,
 };
 
 /* status colors */
