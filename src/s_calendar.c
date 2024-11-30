@@ -12,7 +12,6 @@ const char *DAYS_NAME[7] = {
 
 void calendar_render_func(View *view)
 {
-
     CalendarData *data = (CalendarData *)view->data;
 
     u32 spoor_objects_count = spoor_object_load(&data->spoor_objects);
