@@ -321,7 +321,9 @@ s32 time_compare(SpoorTime *time0, SpoorTime *time1)
     return time0_sum - time1_sum;
 }
 
+#if 0
 u32 time_span_compare(SpoorTimeSpan *time_span0, SpoorTimeSpan *time_span1)
 {
     return 0;
 }
+#endif

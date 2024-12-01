@@ -42,7 +42,7 @@ void calendar_render_func(View *view)
     const u16 text_day_y = DAY_Y - GlobalGraphic.font.height + (GlobalGraphic.font.face->size->metrics.descender >> 6);
     const u16 text_date_y = DAY_Y + (GlobalGraphic.font.face->size->metrics.descender >> 6);
 
-    u32 i, j;
+    u16 i, j;
     for (j = 0; j < data->days_count; j++)
     {
         u16 y = DAY_Y;
@@ -51,7 +51,6 @@ void calendar_render_func(View *view)
 
         struct tm *today_date = localtime(&today_sec);
         
-        u32 text_length = font_text_width_in_pixels(&GlobalGraphic.font, (u8 *)DAYS_NAME[0]);
         /* week days */
         char today_date_buffer[11];
             spoor_time_date_format_create((SpoorTime *)today_date, today_date_buffer);
@@ -70,22 +69,47 @@ void calendar_render_func(View *view)
         today_sec += DAY_SECONDS;
         //render_line_horizontal(x, y, view->width, CONFIG_COLOR_FOREGROUND);
         
+        u16 day_height_limit = DAY_HEIGHT;
+        if ((24 - data->time_offset) * 60 < DAY_HEIGHT)
+            day_height_limit = (24 - data->time_offset) * 60;
+        
         /* seperation line */
         render_line_vertical(x, y, DAY_HEIGHT * (j > 0), CONFIG_COLOR_FOREGROUND);
-        for (i = 0; i < view->height - HEADER_HEIGHT; i++, y++)
+        for (i = 0; i < day_height_limit; i++, y++)
         {
             if (i % 60 == 0)
             {
                 char time_buffer[6];
                 sprintf(time_buffer, "%s%i:00", ((i / 60) + data->time_offset  > 9) ?"" :"0", (i / 60) + data->time_offset);
                 view_render_text(view, x + 5, y + GlobalGraphic.font.height, (u8 *)time_buffer, CONFIG_COLOR_FOREGROUND);
-                render_line_horizontal(x, y, day_width, 0xccaaaaaa);
+                render_line_horizontal(x, y, day_width, 0xeeeeeeee);
+            }
+            else if (i % 30 == 0)
+            {
+                render_line_horizontal(x + 40, y, day_width - 40,  0xaaeeeeee);
+            }
+            else if (i % 15 == 0)
+            {
+                render_line_horizontal(x + 50, y, day_width - 50, 0x66eeeeee);
             }
             else if (i % 5 == 0)
-                render_line_horizontal(x + 50, y, day_width - 50, 0x66aaaaaa);
+                render_line_horizontal(x + 55, y, day_width - 55, 0x88555555);
         }
         x += day_width;
     }
+
+    y = DAY_Y;
+
+    /* render spoor objects */
+    u32 k;
+    printf("test cound: %d\n", spoor_objects_count);
+    for (k = 0; k < spoor_objects_count; k++)
+    {
+        printf("x: %d, y: %d\n", x, y);
+        view_render_text(view, x + 50, y + 50, (u8 *)data->spoor_objects[k].title, CONFIG_COLOR_FOREGROUND);
+        view_render_text(view, x, y, (u8 *)"Test", CONFIG_COLOR_FOREGROUND);
+    }
+
 }
 
 void calendar_input_func(View *view, u8 key)
@@ -103,10 +127,10 @@ void calendar_input_func(View *view, u8 key)
 
     switch (key)
     {
-        case 's': calendar_data->date_offset--; break;
+        case 'a': calendar_data->date_offset--; break;
         case 'n': calendar_data->time_offset++; break;
         case 'r': if (calendar_data->time_offset != 0) { calendar_data->time_offset--; } break;
-        case 't': calendar_data->date_offset++; break;
+        case 'e': calendar_data->date_offset++; break;
     }
 
     graphic_update();
