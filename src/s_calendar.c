@@ -98,7 +98,10 @@ void calendar_render_func(View *view)
         x += day_width;
     }
 
+#if 0
     y = DAY_Y;
+    x = view->x;
+    x += 100;
 
     /* render spoor objects */
     u32 k;
@@ -109,6 +112,7 @@ void calendar_render_func(View *view)
         view_render_text(view, x + 50, y + 50, (u8 *)data->spoor_objects[k].title, CONFIG_COLOR_FOREGROUND);
         view_render_text(view, x, y, (u8 *)"Test", CONFIG_COLOR_FOREGROUND);
     }
+#endif
 
 }
 

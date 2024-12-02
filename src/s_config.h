@@ -25,7 +25,7 @@ enum {
 
 u32 config_colors[] = {
     0xff000000,
-    0xff957D95
+    0xff406050
 };
 
 /* CONFIG STATUS BAR */

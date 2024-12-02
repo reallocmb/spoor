@@ -7,6 +7,7 @@
 #include"s_render.c"
 #include"s_status_bar.c"
 #include"s_view.c"
+#include"s_filter.c"
 #include"s_command_buffer.c"
 #include"s_xlib.c"
 #include"s_win32.c"
@@ -148,7 +149,7 @@ int main(void)
     graphic_init();
 
     /* remove after */
-#if 0
+#if 1
     view_append(&GlobalGraphic.views,
                 &GlobalGraphic.views_count,
                 &GlobalGraphic.views_index,
@@ -156,12 +157,14 @@ int main(void)
                 view_default_render_func);
     GlobalGraphic.views[GlobalGraphic.views_index].data = malloc(sizeof(TaskListData));
     ((Data *)GlobalGraphic.views[GlobalGraphic.views_index].data)->index = 0;
+    ((TaskListData *)GlobalGraphic.views[GlobalGraphic.views_index].data)->spoor_filter.type = SPOOR_FILTER_TYPE_ALL;
+    ((TaskListData *)GlobalGraphic.views[GlobalGraphic.views_index].data)->spoor_filter.status = SPOOR_FILTER_STATUS_ALL;
 
     GlobalGraphic.views[GlobalGraphic.views_index].render_func = task_list_render_func;
     GlobalGraphic.views[GlobalGraphic.views_index].input_func = task_list_input_func;
 #endif
 
-#if 1
+#if 0
     view_append(&GlobalGraphic.views,
                 &GlobalGraphic.views_count,
                 &GlobalGraphic.views_index,

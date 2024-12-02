@@ -12,15 +12,6 @@ void task_list_render_func(View *view)
 
     u16 x = view->x;
     u16 y = view->y;
-#if 0
-    u16 width = view->width;
-    u16 height = view->height;
-#endif
-
-#if 0
-    u32 size = GlobalGraphic.font.size;
-    font_size_set(&GlobalGraphic.font, 15);
-#endif
 
     /* hand highlight */
     if (task_list_data->hand_index >= spoor_objects_count)
@@ -29,37 +20,42 @@ void task_list_render_func(View *view)
                           view->width, GlobalGraphic.font.height,
                           CONFIG_COLOR_STATUS_BAR_BACKGROUND);
 
-    y += GlobalGraphic.font.height;
-    x += 30;
+    y += GlobalGraphic.font.height + (GlobalGraphic.font.face->size->metrics.descender >> 6);
 
-    u16 x_backup;
     u32 i;
-    for (i = 0; i < spoor_objects_count; i++, x = x_backup)
+    for (i = 0; i < spoor_objects_count; i++)
     {
-        x_backup = x;
+        if (!(task_list_data->spoor_filter.type & SPOOR_FLITER_TYPES_BITS[task_list_data->spoor_objects[i].type]))
+            continue;
+        if (!(task_list_data->spoor_filter.status & SPOOR_FILTER_STATUS_BITS[task_list_data->spoor_objects[i].status]))
+            continue;
+
+        x = view->x + 10;
+
         char buffer_i[5];
         sprintf(buffer_i, "%i", i);
         view_render_text(view, x, y, (u8 *)buffer_i, CONFIG_COLOR_FOREGROUND);
+
         x += 20;
         view_render_text(view, x, y, (u8 *)task_list_data->spoor_objects[i].title, CONFIG_COLOR_FOREGROUND);
         char time_span_format[22];
 
         /* deadline */
+        x += 340;
 		spoor_time_span_deadline_format_create(&task_list_data->spoor_objects[i].deadline,
 											   time_span_format);
-        x += 340;
         view_render_text(view, x, y, (u8 *)time_span_format, CONFIG_COLOR_FOREGROUND);
 
         /* schedule */
+        x += 150;
         spoor_time_span_schedule_format_create(&task_list_data->spoor_objects[i].schedule,
                                                time_span_format);
-        x += 150;
         view_render_text(view, x, y, (u8 *)time_span_format, CONFIG_COLOR_FOREGROUND);
 
         /* tracked */
+        x += 210;
         spoor_time_span_schedule_format_create(&task_list_data->spoor_objects[i].tracked,
                                                time_span_format);
-        x += 210;
         view_render_text(view, x, y, (u8 *)time_span_format, CONFIG_COLOR_FOREGROUND);
 
         /* type */
@@ -73,9 +69,34 @@ void task_list_render_func(View *view)
         y += GlobalGraphic.font.height;
     }
 
-#if 0
-    font_size_set(&GlobalGraphic.font, size);
-#endif
+    x = view->x;
+    y = view->y;
+
+    /* render filter information */
+    x += view->width - 180;
+    y += view->height - 2 * (GlobalGraphic.font.height - (GlobalGraphic.font.face->size->metrics.descender >> 6));
+
+    char filter_buffer[8 + 8 + 6];
+
+
+    sprintf(filter_buffer, "Filter Types: %c%c%c%c%c%c%c",
+           (task_list_data->spoor_filter.type & SPOOR_FILTER_TYPE_TASK) ?'T' :'-',
+           (task_list_data->spoor_filter.type & SPOOR_FILTER_TYPE_PROJECT) ?'P' :'-',
+           (task_list_data->spoor_filter.type & SPOOR_FILTER_TYPE_EVENT) ?'E' :'-',
+           (task_list_data->spoor_filter.type & SPOOR_FILTER_TYPE_APPOINTMENT) ?'A' :'-',
+           (task_list_data->spoor_filter.type & SPOOR_FILTER_TYPE_GOAL) ?'G' :'-',
+           (task_list_data->spoor_filter.type & SPOOR_FILTER_TYPE_HABIT) ?'H' :'-',
+           (task_list_data->spoor_filter.type & SPOOR_FILTER_TYPE_IDEA) ?'I' :'-');
+
+    view_render_text(view, x, y, filter_buffer, CONFIG_COLOR_FOREGROUND);
+
+    y += GlobalGraphic.font.height - (GlobalGraphic.font.face->size->metrics.descender >> 6);
+    sprintf(filter_buffer, "Filter Status: %c%c%c",
+           (task_list_data->spoor_filter.status & SPOOR_FILTER_STATUS_NOT_STARTED) ?'N' :'-',
+           (task_list_data->spoor_filter.status & SPOOR_FILTER_STATUS_IN_PROGRESS) ?'I' :'-',
+           (task_list_data->spoor_filter.status & SPOOR_FILTER_STATUS_COMPLETED) ?'C' :'-');
+
+    view_render_text(view, x, y, filter_buffer, CONFIG_COLOR_FOREGROUND);
 }
 
 void task_list_input_func(View *view, u8 key)
@@ -93,11 +114,19 @@ void task_list_input_func(View *view, u8 key)
             command_buffer_clear(&GlobalGraphic.command_buffer);
         }
     }
-    else if(strncmp((char *)GlobalGraphic.command_buffer.buffer + GlobalGraphic.command_buffer.count - 1, "e", 1) == 0)
+    else if (strncmp((char *)GlobalGraphic.command_buffer.buffer + GlobalGraphic.command_buffer.count - 1, "e", 1) == 0)
     {
         GlobalGraphic.mode = GRAPHIC_MODE_COMMAND_BUFFER;
         GlobalGraphic.command_buffer.buffer[0] = ':';
         GlobalGraphic.command_buffer.buffer[1] = 'e';
+        GlobalGraphic.command_buffer.buffer[2] = 0;
+        GlobalGraphic.command_buffer.count = 2;
+    }
+    else if (strncmp((char *)GlobalGraphic.command_buffer.buffer + GlobalGraphic.command_buffer.count - 1, "f", 1) == 0)
+    {
+        GlobalGraphic.mode = GRAPHIC_MODE_COMMAND_BUFFER;
+        GlobalGraphic.command_buffer.buffer[0] = ':';
+        GlobalGraphic.command_buffer.buffer[1] = 'f';
         GlobalGraphic.command_buffer.buffer[2] = 0;
         GlobalGraphic.command_buffer.count = 2;
     }

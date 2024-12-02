@@ -23,6 +23,11 @@ void command_buffer_execute(void)
         spoor_object_print(spoor_object);
         printf(":e ->>>>>>>> test\n");
     }
+    else if (strncmp((char *)command_buffer->buffer, ":f", 2) == 0)
+    {
+        TaskListData *data = (TaskListData *)GlobalGraphic.views[GlobalGraphic.views_index].data;
+        spoor_filter_change(&data->spoor_filter, (char *)command_buffer->buffer + 2);
+    }
     else if (memcmp(command_buffer->buffer, ":close", 6 * sizeof(*command_buffer->buffer)) == 0)
     {
         view_close(GlobalGraphic.views_index);

@@ -176,6 +176,41 @@ typedef struct SOTT {
     u32 id_prev; // 4 bytes
     u32 id_next; // 4 bytes
 } SOTT; // 496 bytes
+
+#define SPOOR_FILTER_STATUS_NOT_STARTED 0x1
+#define SPOOR_FILTER_STATUS_IN_PROGRESS (0x1 << 1)
+#define SPOOR_FILTER_STATUS_COMPLETED (0x1 << 2)
+#define SPOOR_FILTER_STATUS_ALL 0b111
+
+const u3, SPOOR_FILTER_STATUS_BITS[3] = {
+    SPOOR_FILTER_STATUS_NOT_STARTED,
+    SPOOR_FILTER_STATUS_IN_PROGRESS,
+    SPOOR_FILTER_STATUS_COMPLETED,
+};
+
+#define SPOOR_FILTER_TYPE_TASK 0x1
+#define SPOOR_FILTER_TYPE_PROJECT (0x1 << 1)
+#define SPOOR_FILTER_TYPE_EVENT (0x1 << 2)
+#define SPOOR_FILTER_TYPE_APPOINTMENT (0x1 << 3)
+#define SPOOR_FILTER_TYPE_GOAL (0x1 << 4)
+#define SPOOR_FILTER_TYPE_HABIT (0x1 << 5)
+#define SPOOR_FILTER_TYPE_IDEA (0x1 << 6)
+#define SPOOR_FILTER_TYPE_ALL 0b1111111
+
+const u32 SPOOR_FLITER_TYPES_BITS[7] = {
+    SPOOR_FILTER_TYPE_TASK,
+    SPOOR_FILTER_TYPE_PROJECT,
+    SPOOR_FILTER_TYPE_EVENT,
+    SPOOR_FILTER_TYPE_APPOINTMENT,
+    SPOOR_FILTER_TYPE_GOAL,
+    SPOOR_FILTER_TYPE_HABIT,
+    SPOOR_FILTER_TYPE_IDEA,
+};
+
+typedef struct SpoorFilter {
+    u32 type;
+    u32 status;
+} SpoorFilter;
         
 #define SPOOR_OBJECT_TITLE_SIZE_MAX 240
 #define SPOOR_OBJECT_NO_PARENT_ID 0xffffffff
@@ -206,6 +241,7 @@ typedef struct Data {
 typedef struct TaskListData {
     SpoorObject *spoor_objects;
     u32 hand_index;
+    SpoorFilter spoor_filter;
 } TaskListData;
 
 #define DAY_SECONDS 86400
