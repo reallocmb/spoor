@@ -88,7 +88,7 @@ void task_list_render_func(View *view)
            (task_list_data->spoor_filter.type & SPOOR_FILTER_TYPE_HABIT) ?'H' :'-',
            (task_list_data->spoor_filter.type & SPOOR_FILTER_TYPE_IDEA) ?'I' :'-');
 
-    view_render_text(view, x, y, filter_buffer, CONFIG_COLOR_FOREGROUND);
+    view_render_text(view, x, y, (u8 *)filter_buffer, CONFIG_COLOR_FOREGROUND);
 
     y += GlobalGraphic.font.height - (GlobalGraphic.font.face->size->metrics.descender >> 6);
     sprintf(filter_buffer, "Filter Status: %c%c%c",
@@ -96,7 +96,7 @@ void task_list_render_func(View *view)
            (task_list_data->spoor_filter.status & SPOOR_FILTER_STATUS_IN_PROGRESS) ?'I' :'-',
            (task_list_data->spoor_filter.status & SPOOR_FILTER_STATUS_COMPLETED) ?'C' :'-');
 
-    view_render_text(view, x, y, filter_buffer, CONFIG_COLOR_FOREGROUND);
+    view_render_text(view, x, y, (u8 *)filter_buffer, CONFIG_COLOR_FOREGROUND);
 }
 
 void task_list_input_func(View *view, u8 key)
