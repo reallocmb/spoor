@@ -1,5 +1,22 @@
 #include"spoor.h"
 
+void spoor_filter_set(SpoorFilter *spoor_filter, SpoorObject *spoor_objects, u32 *spoor_objects_count)
+{
+    u32 i, j;
+    for (i = 0, j = 0; i < *spoor_objects_count; i++)
+    {
+        if (!(spoor_filter->type & SPOOR_FLITER_TYPES_BITS[spoor_objects[i].type]))
+            continue;
+        if (!(spoor_filter->status & SPOOR_FILTER_STATUS_BITS[spoor_objects[i].status]))
+            continue;
+
+        spoor_objects[j] = spoor_objects[i];
+        j++;
+    }
+
+    *spoor_objects_count = j;
+}
+
 void spoor_filter_change(SpoorFilter *spoor_filter, char *arguments)
 {
     if (arguments[0] == ' ')

@@ -110,6 +110,7 @@ void input_func(u8 key)
             {
                 GlobalGraphic.mode = GRAPHIC_MODE_NORMAL;
                 command_buffer_execute();
+                command_buffer_clear(&GlobalGraphic.command_buffer);
             } break;
 
             case SPOOR_INPUT_ASCII_KEY_BACKSPACE:

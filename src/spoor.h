@@ -24,7 +24,7 @@ typedef struct SpoorFont {
     u16 height;
 } SpoorFont;
 
-#define COMMAND_BUFFER_ALLOC_SIZE 250
+#define COMMAND_BUFFER_ALLOC_SIZE 500
 
 typedef struct CommandBuffer {
     u8 *buffer;

@@ -6,6 +6,7 @@ void task_list_render_func(View *view)
 
     u32 spoor_objects_count = spoor_object_load(&task_list_data->spoor_objects);
     spoor_object_sort(task_list_data->spoor_objects, spoor_objects_count);
+    spoor_filter_set(&task_list_data->spoor_filter, task_list_data->spoor_objects, &spoor_objects_count);
 
     if (spoor_objects_count == 0)
         task_list_data->hand_index = TASK_LIST_HAND_INDEX_DEFAULT;
@@ -25,10 +26,12 @@ void task_list_render_func(View *view)
     u32 i;
     for (i = 0; i < spoor_objects_count; i++)
     {
+        /* spoor_filter_set is invented 
         if (!(task_list_data->spoor_filter.type & SPOOR_FLITER_TYPES_BITS[task_list_data->spoor_objects[i].type]))
             continue;
         if (!(task_list_data->spoor_filter.status & SPOOR_FILTER_STATUS_BITS[task_list_data->spoor_objects[i].status]))
             continue;
+            */
 
         x = view->x + 10;
 
@@ -40,8 +43,60 @@ void task_list_render_func(View *view)
         view_render_text(view, x, y, (u8 *)task_list_data->spoor_objects[i].title, CONFIG_COLOR_FOREGROUND);
         char time_span_format[22];
 
+        /* deadline feature */
+        x += 325;
+        char time_offset_buffer[6] = { 0 };
+        time_t today_sec = time(NULL);
+        struct tm test = { 0 };
+        test.tm_mday = task_list_data->spoor_objects[i].deadline.end.day;
+        test.tm_mon = task_list_data->spoor_objects[i].deadline.end.mon - 1;
+        test.tm_year = task_list_data->spoor_objects[i].deadline.end.year - 1900;
+        struct tm loc = *localtime(&today_sec);
+        time_t spoor_object_sec = mktime(&test);
+
+        u32 time_color = 0xff00ff00;
+
+        u32 diff_day = 0;
+        char negativ_buffer = '+';
+
+        u32 today_day = today_sec / 60 / 60 / 24;
+        u32 spoor_object_day = spoor_object_sec / 60 / 60 / 24 + 1;
+
+        if (spoor_object_day != today_day)
+        {
+            if (spoor_object_sec > today_sec)
+            {
+                diff_day = spoor_object_day - today_day;
+            }
+            else
+            {
+                negativ_buffer = '-';
+                time_color = 0xffff0000;
+                diff_day = today_day - spoor_object_day;
+            }
+
+            u32 off = 0;
+            if (diff_day < 100)
+                time_offset_buffer[off++] = ' ';
+            if (diff_day < 10)
+                time_offset_buffer[off++] = ' ';
+
+            if (diff_day > 999)
+            {
+                u32 i;
+                for (i = 0; time_offset_buffer[i] != 0; i++)
+                    time_offset_buffer[i] = negativ_buffer;
+                strcpy(time_offset_buffer, "+++++");
+            }
+            else
+                sprintf(time_offset_buffer + off, "%c%id", negativ_buffer, diff_day);
+
+            view_render_text(view, x, y, (u8 *)time_offset_buffer, time_color);
+        }
+
+
         /* deadline */
-        x += 340;
+        x += 50;
 		spoor_time_span_deadline_format_create(&task_list_data->spoor_objects[i].deadline,
 											   time_span_format);
         view_render_text(view, x, y, (u8 *)time_span_format, CONFIG_COLOR_FOREGROUND);
@@ -113,6 +168,14 @@ void task_list_input_func(View *view, u8 key)
             spoor_object_remove(spoor_object);
             command_buffer_clear(&GlobalGraphic.command_buffer);
         }
+    }
+    else if (strncmp((char *)GlobalGraphic.command_buffer.buffer + GlobalGraphic.command_buffer.count - 1, "c", 1) == 0)
+    {
+        GlobalGraphic.mode = GRAPHIC_MODE_COMMAND_BUFFER;
+        GlobalGraphic.command_buffer.buffer[0] = ':';
+        GlobalGraphic.command_buffer.buffer[1] = 'c';
+        GlobalGraphic.command_buffer.buffer[2] = 0;
+        GlobalGraphic.command_buffer.count = 2;
     }
     else if (strncmp((char *)GlobalGraphic.command_buffer.buffer + GlobalGraphic.command_buffer.count - 1, "e", 1) == 0)
     {
