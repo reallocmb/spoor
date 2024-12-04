@@ -148,7 +148,7 @@ void view_render_text(View *view,
     pen_y = y;
 
     u32 i;
-    for (i = 0; i < text[i]; i++)
+    for (i = 0; text[i] != 0; i++)
     {
         FT_ULong glyph_index = FT_Get_Char_Index(GlobalGraphic.font.face, utf8_decode(text, &i));
 
@@ -205,7 +205,7 @@ void render_text(u16 x,
     pen_y = y;
 
     u32 i;
-    for (i = 0; i < text[i]; i++)
+    for (i = 0; text[i] != 0; i++)
     {
         FT_ULong glyph_index = FT_Get_Char_Index(GlobalGraphic.font.face, utf8_decode(text, &i));
 

@@ -2,22 +2,22 @@
 
 void task_list_render_func(View *view)
 {
-    TaskListData *task_list_data = (TaskListData *)view->data;
+    TaskListData *data = (TaskListData *)view->data;
 
-    u32 spoor_objects_count = spoor_object_load(&task_list_data->spoor_objects);
-    spoor_object_sort(task_list_data->spoor_objects, spoor_objects_count);
-    spoor_filter_set(&task_list_data->spoor_filter, task_list_data->spoor_objects, &spoor_objects_count);
+    u32 spoor_objects_count = spoor_object_load(&data->spoor_objects);
+    spoor_object_sort(data->spoor_objects, spoor_objects_count);
+    spoor_filter_set(&data->spoor_filter, data->spoor_objects, &spoor_objects_count);
 
     if (spoor_objects_count == 0)
-        task_list_data->hand_index = TASK_LIST_HAND_INDEX_DEFAULT;
+        data->hand_index = TASK_LIST_HAND_INDEX_DEFAULT;
 
     u16 x = view->x;
     u16 y = view->y;
 
     /* hand highlight */
-    if (task_list_data->hand_index >= spoor_objects_count)
-        task_list_data->hand_index = spoor_objects_count - 1;
-    render_rectangle_fill(x, y + task_list_data->hand_index * GlobalGraphic.font.height,
+    if (data->hand_index >= spoor_objects_count)
+        data->hand_index = spoor_objects_count - 1;
+    render_rectangle_fill(x, y + data->hand_index * GlobalGraphic.font.height,
                           view->width, GlobalGraphic.font.height,
                           CONFIG_COLOR_STATUS_BAR_BACKGROUND);
 
@@ -26,21 +26,19 @@ void task_list_render_func(View *view)
     u32 i;
     for (i = 0; i < spoor_objects_count; i++)
     {
-        /* spoor_filter_set is invented 
-        if (!(task_list_data->spoor_filter.type & SPOOR_FLITER_TYPES_BITS[task_list_data->spoor_objects[i].type]))
-            continue;
-        if (!(task_list_data->spoor_filter.status & SPOOR_FILTER_STATUS_BITS[task_list_data->spoor_objects[i].status]))
-            continue;
-            */
-
         x = view->x + 10;
 
         char buffer_i[5];
-        sprintf(buffer_i, "%i", i);
+        s32 relativ_number = i - data->hand_index;
+        if (relativ_number == 0)
+            relativ_number = i;
+        else if (relativ_number < 0)
+            relativ_number = ~relativ_number + 1;
+        sprintf(buffer_i, "%i", relativ_number);
         view_render_text(view, x, y, (u8 *)buffer_i, CONFIG_COLOR_FOREGROUND);
 
         x += 20;
-        view_render_text(view, x, y, (u8 *)task_list_data->spoor_objects[i].title, CONFIG_COLOR_FOREGROUND);
+        view_render_text(view, x, y, (u8 *)data->spoor_objects[i].title, CONFIG_COLOR_FOREGROUND);
         char time_span_format[22];
 
         /* deadline feature */
@@ -48,9 +46,9 @@ void task_list_render_func(View *view)
         char time_offset_buffer[6] = { 0 };
         time_t today_sec = time(NULL);
         struct tm test = { 0 };
-        test.tm_mday = task_list_data->spoor_objects[i].deadline.end.day;
-        test.tm_mon = task_list_data->spoor_objects[i].deadline.end.mon - 1;
-        test.tm_year = task_list_data->spoor_objects[i].deadline.end.year - 1900;
+        test.tm_mday = data->spoor_objects[i].deadline.end.day;
+        test.tm_mon = data->spoor_objects[i].deadline.end.mon - 1;
+        test.tm_year = data->spoor_objects[i].deadline.end.year - 1900;
         struct tm loc = *localtime(&today_sec);
         time_t spoor_object_sec = mktime(&test);
 
@@ -97,29 +95,29 @@ void task_list_render_func(View *view)
 
         /* deadline */
         x += 50;
-		spoor_time_span_deadline_format_create(&task_list_data->spoor_objects[i].deadline,
+		spoor_time_span_deadline_format_create(&data->spoor_objects[i].deadline,
 											   time_span_format);
         view_render_text(view, x, y, (u8 *)time_span_format, CONFIG_COLOR_FOREGROUND);
 
         /* schedule */
         x += 150;
-        spoor_time_span_schedule_format_create(&task_list_data->spoor_objects[i].schedule,
+        spoor_time_span_schedule_format_create(&data->spoor_objects[i].schedule,
                                                time_span_format);
         view_render_text(view, x, y, (u8 *)time_span_format, CONFIG_COLOR_FOREGROUND);
 
         /* tracked */
         x += 210;
-        spoor_time_span_schedule_format_create(&task_list_data->spoor_objects[i].tracked,
+        spoor_time_span_schedule_format_create(&data->spoor_objects[i].tracked,
                                                time_span_format);
         view_render_text(view, x, y, (u8 *)time_span_format, CONFIG_COLOR_FOREGROUND);
 
         /* type */
         x += 210;
-        view_render_text(view, x, y, (u8 *)SPOOR_TYPES[task_list_data->spoor_objects[i].type], CONFIG_COLOR_FOREGROUND);
+        view_render_text(view, x, y, (u8 *)SPOOR_TYPES[data->spoor_objects[i].type], CONFIG_COLOR_FOREGROUND);
 
         /* status */
         x += 80;
-        view_render_text(view, x, y, (u8 *)SPOOR_STATUS[task_list_data->spoor_objects[i].status], CONFIG_COLOR_STATUS[task_list_data->spoor_objects[i].status]);
+        view_render_text(view, x, y, (u8 *)SPOOR_STATUS[data->spoor_objects[i].status], CONFIG_COLOR_STATUS[data->spoor_objects[i].status]);
 
         y += GlobalGraphic.font.height;
     }
@@ -135,21 +133,21 @@ void task_list_render_func(View *view)
 
 
     sprintf(filter_buffer, "Filter Types: %c%c%c%c%c%c%c",
-           (task_list_data->spoor_filter.type & SPOOR_FILTER_TYPE_TASK) ?'T' :'-',
-           (task_list_data->spoor_filter.type & SPOOR_FILTER_TYPE_PROJECT) ?'P' :'-',
-           (task_list_data->spoor_filter.type & SPOOR_FILTER_TYPE_EVENT) ?'E' :'-',
-           (task_list_data->spoor_filter.type & SPOOR_FILTER_TYPE_APPOINTMENT) ?'A' :'-',
-           (task_list_data->spoor_filter.type & SPOOR_FILTER_TYPE_GOAL) ?'G' :'-',
-           (task_list_data->spoor_filter.type & SPOOR_FILTER_TYPE_HABIT) ?'H' :'-',
-           (task_list_data->spoor_filter.type & SPOOR_FILTER_TYPE_IDEA) ?'I' :'-');
+           (data->spoor_filter.type & SPOOR_FILTER_TYPE_TASK) ?'T' :'-',
+           (data->spoor_filter.type & SPOOR_FILTER_TYPE_PROJECT) ?'P' :'-',
+           (data->spoor_filter.type & SPOOR_FILTER_TYPE_EVENT) ?'E' :'-',
+           (data->spoor_filter.type & SPOOR_FILTER_TYPE_APPOINTMENT) ?'A' :'-',
+           (data->spoor_filter.type & SPOOR_FILTER_TYPE_GOAL) ?'G' :'-',
+           (data->spoor_filter.type & SPOOR_FILTER_TYPE_HABIT) ?'H' :'-',
+           (data->spoor_filter.type & SPOOR_FILTER_TYPE_IDEA) ?'I' :'-');
 
     view_render_text(view, x, y, (u8 *)filter_buffer, CONFIG_COLOR_FOREGROUND);
 
     y += GlobalGraphic.font.height - (GlobalGraphic.font.face->size->metrics.descender >> 6);
     sprintf(filter_buffer, "Filter Status: %c%c%c",
-           (task_list_data->spoor_filter.status & SPOOR_FILTER_STATUS_NOT_STARTED) ?'N' :'-',
-           (task_list_data->spoor_filter.status & SPOOR_FILTER_STATUS_IN_PROGRESS) ?'I' :'-',
-           (task_list_data->spoor_filter.status & SPOOR_FILTER_STATUS_COMPLETED) ?'C' :'-');
+           (data->spoor_filter.status & SPOOR_FILTER_STATUS_NOT_STARTED) ?'N' :'-',
+           (data->spoor_filter.status & SPOOR_FILTER_STATUS_IN_PROGRESS) ?'I' :'-',
+           (data->spoor_filter.status & SPOOR_FILTER_STATUS_COMPLETED) ?'C' :'-');
 
     view_render_text(view, x, y, (u8 *)filter_buffer, CONFIG_COLOR_FOREGROUND);
 }
@@ -196,8 +194,19 @@ void task_list_input_func(View *view, u8 key)
 
     switch (key)
     {
-        case 'n': task_list_data->hand_index++; break;
-        case 'r': if (task_list_data->hand_index != 0) { task_list_data->hand_index--; } break;
+        case 'n':
+        {
+            u32 counter = command_buffer_counter_detect(&GlobalGraphic.command_buffer, 1);
+            task_list_data->hand_index += counter;
+        } break;
+        case 'r':
+        {
+            u32 counter = command_buffer_counter_detect(&GlobalGraphic.command_buffer, 1);
+            if (task_list_data->hand_index >= counter)
+            {
+                task_list_data->hand_index -= counter;
+            }
+        } break;
     }
 
     graphic_update();

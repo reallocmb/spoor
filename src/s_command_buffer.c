@@ -49,3 +49,23 @@ void command_buffer_clear(CommandBuffer *command_buffer)
     command_buffer->buffer[0] = 0;
     command_buffer->count = 0;
 }
+
+u32 command_buffer_counter_detect(CommandBuffer *command_buffer, u32 counter_default)
+{
+    u32 counter = 0;
+
+    u32 i = command_buffer->count - 1;
+    u32 digit_mul = 1;
+    while (i--)
+    {
+        if (!(command_buffer->buffer[i] >= 0x30 && command_buffer->buffer[i] <= 0x39))
+            break;
+        counter += (command_buffer->buffer[i] - 0x30) * digit_mul;
+        digit_mul *= 10;
+    }
+
+    if (counter == 0)
+        counter = counter_default;
+
+    return counter;
+}
