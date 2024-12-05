@@ -93,7 +93,7 @@ void calendar_render_func(View *view)
                 render_line_horizontal(x + 50, y, day_width - 50, 0x66eeeeee);
             }
             else if (i % 5 == 0)
-                render_line_horizontal(x + 55, y, day_width - 55, 0x88555555);
+                render_line_horizontal(x + 55, y, day_width - 55, 0x88888888);
         }
         x += day_width;
     }

@@ -28,11 +28,6 @@ void command_buffer_execute(void)
         TaskListData *data = (TaskListData *)GlobalGraphic.views[GlobalGraphic.views_index].data;
         spoor_filter_change(&data->spoor_filter, (char *)command_buffer->buffer + 2);
     }
-    else if (memcmp(command_buffer->buffer, ":close", 6 * sizeof(*command_buffer->buffer)) == 0)
-    {
-        view_close(GlobalGraphic.views_index);
-        return;
-    }
     else if (memcmp(command_buffer->buffer, ":q", 2 * sizeof(*command_buffer->buffer)) == 0)
         exit(0);
     else

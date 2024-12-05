@@ -1,4 +1,5 @@
 #include"spoor.h" /* for lsp reason */
+#include <string.h>
 
 void views_init(View **views)
 {
@@ -143,6 +144,7 @@ View *views_childs_render(View **views) /* todo(mb) it's crap */
         child->x = parent->x + k * cw;
         child->y = parent->y + k * ch;
         child->id = child - GlobalGraphic.views;
+        child->parent_id = parent->id;
 
         if (child->flags & VIEW_FLAG_PARENT)
         {
@@ -289,9 +291,53 @@ void view_close(u32 index)
 {
     u32 *views_count = &GlobalGraphic.views_count;
 
-    if (index == 1)
+    if (index == 0)
     {
-        *views_count = 0;
+        GlobalGraphic.views_count = 0;
+    }
+    else
+    {
+        View *view = &GlobalGraphic.views[index];
+        View *parent = &GlobalGraphic.views[view->parent_id];
+
+        if (parent->childs_count == 2)
+        {
+            View *child_existing = parent + 3 - (view - parent);
+            parent->flags = child_existing->flags;
+            /*
+            parent->id;
+            parent->x;
+            parent->y;
+            parent->width;
+            parent->height;
+            parent->parent_id;
+            */
+            parent->childs_count = child_existing->childs_count;
+            parent->render_func = child_existing->render_func; /* void *graphic => Graphic *graphic */
+            parent->input_func = child_existing->input_func;
+            parent->data = child_existing->data;
+
+            memcpy(parent + 1, parent + 3, sizeof(*parent) * ((*views_count - 1) - (parent->id + 2)));
+
+            GlobalGraphic.views_count -= 2;
+
+            if (parent->flags & VIEW_FLAG_PARENT)
+                GlobalGraphic.views_index = parent->id + 1;
+            else
+                GlobalGraphic.views_index = parent->id;
+        }
+        else
+        {
+            memcpy(view, view + 1, sizeof(*view) * ((*views_count - 1) - index));
+            parent->childs_count--;
+            (*views_count)--;
+
+            if (index > *views_count - 1)
+                GlobalGraphic.views_index = *views_count - 1;
+
+            if (GlobalGraphic.views[GlobalGraphic.views_index].flags & VIEW_FLAG_PARENT)
+                GlobalGraphic.views_index++;
+        }
     }
 }
 
@@ -337,4 +383,12 @@ void view_focus_right(u32 *views_index)
         *views_index += 1;
     }
     while (GlobalGraphic.views[*views_index].flags & VIEW_FLAG_PARENT);
+}
+
+void views_debug(View *views, u32 views_count)
+{
+    u32 i;
+    for (i = 0; i < views_count; i++)
+    {
+    }
 }

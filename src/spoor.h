@@ -240,7 +240,7 @@ typedef struct Data {
 
 typedef struct TaskListData {
     SpoorObject *spoor_objects;
-    u32 hand_index;
+    u32 index;
     SpoorFilter spoor_filter;
 } TaskListData;
 

@@ -41,8 +41,6 @@ void input_func(u8 key)
                             &GlobalGraphic.views_index,
                             VIEW_FLAG_VERTICAL,
                             view_default_render_func);
-                GlobalGraphic.views[GlobalGraphic.views_index].data = malloc(sizeof(TaskListData));
-                ((Data *)GlobalGraphic.views[GlobalGraphic.views_index].data)->index = 0;
             } break;
 
             case SPOOR_INPUT_ASCII_KEY_CONTROL_H:
@@ -52,8 +50,6 @@ void input_func(u8 key)
                             &GlobalGraphic.views_index,
                             VIEW_FLAG_HORIZONTAL,
                             view_default_render_func);
-                GlobalGraphic.views[GlobalGraphic.views_index].data = malloc(sizeof(TaskListData));
-                ((TaskListData *)GlobalGraphic.views[GlobalGraphic.views_index].data)->hand_index = 0;
             } break;
 
             default:
@@ -65,20 +61,31 @@ void input_func(u8 key)
 
         bool have_to_command_buffer_clear = true;
 
-        /* view input current index */
-        View *view_current = &GlobalGraphic.views[GlobalGraphic.views_index];
-        if (view_current->input_func != NULL)
-            view_current->input_func(view_current, key);
 
         if (strncmp((char *)GlobalGraphic.command_buffer.buffer + GlobalGraphic.command_buffer.count - 2, "lt", 2) == 0)
         {
+            GlobalGraphic.views[GlobalGraphic.views_index].data = malloc(sizeof(TaskListData));
+            ((TaskListData *)GlobalGraphic.views[GlobalGraphic.views_index].data)->index = 0;
+            ((TaskListData *)GlobalGraphic.views[GlobalGraphic.views_index].data)->spoor_filter.type = SPOOR_FILTER_TYPE_ALL;
+            ((TaskListData *)GlobalGraphic.views[GlobalGraphic.views_index].data)->spoor_filter.status = SPOOR_FILTER_STATUS_ALL;
+
             GlobalGraphic.views[GlobalGraphic.views_index].render_func = task_list_render_func;
             GlobalGraphic.views[GlobalGraphic.views_index].input_func = task_list_input_func;
         }
         else if (strncmp((char *)GlobalGraphic.command_buffer.buffer + GlobalGraphic.command_buffer.count - 2, "lc", 2) == 0)
         {
+            GlobalGraphic.views[GlobalGraphic.views_index].data = malloc(sizeof(CalendarData));
+            ((CalendarData *)GlobalGraphic.views[GlobalGraphic.views_index].data)->index = 0;
+            ((CalendarData *)GlobalGraphic.views[GlobalGraphic.views_index].data)->days_count = 5;
+            ((CalendarData *)GlobalGraphic.views[GlobalGraphic.views_index].data)->time_offset = 8;
+            ((CalendarData *)GlobalGraphic.views[GlobalGraphic.views_index].data)->date_offset = 0;
+
             GlobalGraphic.views[GlobalGraphic.views_index].render_func = calendar_render_func;
             GlobalGraphic.views[GlobalGraphic.views_index].input_func = calendar_input_func;
+        }
+        else if (strncmp((char *)GlobalGraphic.command_buffer.buffer + GlobalGraphic.command_buffer.count - 2, " c", 2) == 0)
+        {
+            view_close(GlobalGraphic.views_index);
         }
         else if (strncmp((char *)GlobalGraphic.command_buffer.buffer + GlobalGraphic.command_buffer.count - 2, " s", 2) == 0)
         {
@@ -101,6 +108,13 @@ void input_func(u8 key)
 
         if (have_to_command_buffer_clear)
             command_buffer_clear(&GlobalGraphic.command_buffer);
+        else
+        {
+            /* view input current index */
+            View *view_current = &GlobalGraphic.views[GlobalGraphic.views_index];
+            if (view_current->input_func != NULL)
+                view_current->input_func(view_current, key);
+        }
     }
     else if (GlobalGraphic.mode == GRAPHIC_MODE_COMMAND_BUFFER)
     {
@@ -150,7 +164,7 @@ int main(void)
     graphic_init();
 
     /* remove after */
-#if 1
+#if 0
     view_append(&GlobalGraphic.views,
                 &GlobalGraphic.views_count,
                 &GlobalGraphic.views_index,

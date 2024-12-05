@@ -9,15 +9,15 @@ void task_list_render_func(View *view)
     spoor_filter_set(&data->spoor_filter, data->spoor_objects, &spoor_objects_count);
 
     if (spoor_objects_count == 0)
-        data->hand_index = TASK_LIST_HAND_INDEX_DEFAULT;
+        data->index = TASK_LIST_HAND_INDEX_DEFAULT;
 
     u16 x = view->x;
     u16 y = view->y;
 
     /* hand highlight */
-    if (data->hand_index >= spoor_objects_count)
-        data->hand_index = spoor_objects_count - 1;
-    render_rectangle_fill(x, y + data->hand_index * GlobalGraphic.font.height,
+    if (data->index >= spoor_objects_count)
+        data->index = spoor_objects_count - 1;
+    render_rectangle_fill(x, y + data->index * GlobalGraphic.font.height,
                           view->width, GlobalGraphic.font.height,
                           CONFIG_COLOR_STATUS_BAR_BACKGROUND);
 
@@ -29,7 +29,7 @@ void task_list_render_func(View *view)
         x = view->x + 10;
 
         char buffer_i[5];
-        s32 relativ_number = i - data->hand_index;
+        s32 relativ_number = i - data->index;
         if (relativ_number == 0)
             relativ_number = i;
         else if (relativ_number < 0)
@@ -158,11 +158,11 @@ void task_list_input_func(View *view, u8 key)
 
     if (strncmp((char *)GlobalGraphic.command_buffer.buffer + GlobalGraphic.command_buffer.count - 2, "dd", 2) == 0)
     {
-        if (task_list_data->hand_index != TASK_LIST_HAND_INDEX_DEFAULT)
+        if (task_list_data->index != TASK_LIST_HAND_INDEX_DEFAULT)
         {
-            printf("Delete task with index: %d\n", task_list_data->hand_index);
+            printf("Delete task with index: %d\n", task_list_data->index);
             SpoorObject *spoor_objects = ((TaskListData *)view->data)->spoor_objects;
-            SpoorObject *spoor_object = &spoor_objects[task_list_data->hand_index];
+            SpoorObject *spoor_object = &spoor_objects[task_list_data->index];
             spoor_object_remove(spoor_object);
             command_buffer_clear(&GlobalGraphic.command_buffer);
         }
@@ -197,15 +197,13 @@ void task_list_input_func(View *view, u8 key)
         case 'n':
         {
             u32 counter = command_buffer_counter_detect(&GlobalGraphic.command_buffer, 1);
-            task_list_data->hand_index += counter;
+            task_list_data->index += counter;
         } break;
         case 'r':
         {
             u32 counter = command_buffer_counter_detect(&GlobalGraphic.command_buffer, 1);
-            if (task_list_data->hand_index >= counter)
-            {
-                task_list_data->hand_index -= counter;
-            }
+            if (task_list_data->index >= counter)
+                task_list_data->index -= counter;
         } break;
     }
 
