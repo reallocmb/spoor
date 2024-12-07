@@ -164,6 +164,14 @@ void view_render_text(View *view,
         u16 rows;
         u16 cols;
 
+        /*
+        render_line_horizontal(x, (pen_y - view->y) + view->y - (GlobalGraphic.font.face->size->metrics.descender >> 6), slot->bitmap.pitch, 0xffff0000);
+        */
+        if ((pen_y - view->y) - (GlobalGraphic.font.face->size->metrics.descender >> 6) >= view->height)
+        {
+            return;
+        }
+
         u16 slot_pitch = slot->bitmap.pitch;
         if ((x - view->x) + slot_pitch >= view->width)
         {

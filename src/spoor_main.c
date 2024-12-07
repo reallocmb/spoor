@@ -164,7 +164,7 @@ int main(void)
     graphic_init();
 
     /* remove after */
-#if 0
+#if 1
     view_append(&GlobalGraphic.views,
                 &GlobalGraphic.views_count,
                 &GlobalGraphic.views_index,
