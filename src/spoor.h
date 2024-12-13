@@ -112,6 +112,12 @@ struct Graphic {
 };
 
 enum {
+    SPOOR_PRIORITY_HIGH,
+    SPOOR_PRIORITY_MEDIUM,
+    SPOOR_PRIORITY_LOW,
+};
+
+enum {
     SPOOR_STATUS_NOT_STARTED,
     SPOOR_STATUS_IN_PROGRESS,
     SPOOR_STATUS_COMPLETED,
@@ -125,6 +131,12 @@ enum {
     SPOOR_TYPE_GOAL,
     SPOOR_TYPE_HABIT,
     SPOOR_TYPE_IDEA,
+};
+
+const char SPOOR_PRIORITYS[3][12] = {
+    "HIGH",
+    "MEDIUM",
+    "LOW",
 };
 
 const char SPOOR_STATUS[3][25] = {
