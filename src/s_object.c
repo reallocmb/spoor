@@ -16,6 +16,19 @@ u32 argument_next(char **arguments, u32 arguments_last_length)
     return length;
 }
 
+u32 priority_decode(char *argument, u32 argument_length)
+{
+    u32 priority = 0;
+    u32 i;
+    for (i = 1; i < argument_length; i++)
+    {
+        priority *= 10;
+        priority += argument[i] - 0x30;
+    }
+
+    return priority;
+}
+
 void spoor_object_create(SpoorObject *spoor_object, char *arguments, u32 arguments_size, SpoorObject *spoor_object_old)
 {
     /* remove space */
@@ -50,6 +63,7 @@ void spoor_object_create(SpoorObject *spoor_object, char *arguments, u32 argumen
 
     u8 type;
     u8 status;
+    u8 priority;
     if (spoor_object_old == NULL)
     {
         /* init values */
@@ -65,11 +79,13 @@ void spoor_object_create(SpoorObject *spoor_object, char *arguments, u32 argumen
 
         type = SPOOR_TYPE_TASK;
         status = SPOOR_STATUS_NOT_STARTED;
+        priority = 0;
     }
     else
     {
         type = spoor_object_old->type;
         status = spoor_object_old->status;
+        priority = spoor_object_old->priority;
     }
 
     u32 argument_length = 0;
@@ -98,6 +114,10 @@ void spoor_object_create(SpoorObject *spoor_object, char *arguments, u32 argumen
             status = SPOOR_STATUS_IN_PROGRESS;
         else if (strncmp(arguments, "ns", 2) == 0)
             status = SPOOR_STATUS_NOT_STARTED;
+        else if (strncmp(arguments, "p", 1) == 0)
+        {
+            priority = priority_decode(arguments, argument_length);
+        }
         else
         {
             spoor_time_span_create(spoor_time_span, arguments, argument_length);
@@ -107,6 +127,7 @@ void spoor_object_create(SpoorObject *spoor_object, char *arguments, u32 argumen
 
     spoor_object->status = status;
     spoor_object->type = type;
+    spoor_object->priority = priority;
 }
 
 u32 spoor_object_id_free_space(RedbasDB *db, u32 items)

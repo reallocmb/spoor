@@ -121,6 +121,9 @@ void task_list_render_func(View *view)
 
         y += GlobalGraphic.font.height;
     }
+    
+    x += 10;
+    view_render_text(view, x, y, data->spoor_objects[i].priority, CONFIG_COLOR_FOREGROUND);
 
     x = view->x;
     y = view->y;

@@ -133,12 +133,6 @@ enum {
     SPOOR_TYPE_IDEA,
 };
 
-const char SPOOR_PRIORITYS[3][12] = {
-    "HIGH",
-    "MEDIUM",
-    "LOW",
-};
-
 const char SPOOR_STATUS[3][25] = {
     "NOT STARTED",
     "IN PROGRESS",
@@ -219,9 +213,21 @@ const u32 SPOOR_FLITER_TYPES_BITS[7] = {
     SPOOR_FILTER_TYPE_IDEA,
 };
 
+#define SPOOR_FILTER_PRIORITY_HIGH 0x1
+#define SPOOR_FILTER_PRIORITY_MEDIUM (1 << 1)
+#define SPOOR_FILTER_PRIORITY_LOW (1 << 2)
+#define SPOOR_FILTER_PRIORITY_ALL 0x3
+
+const u32 SPOOR_FILTER_PRIORITYS_BITS[3] = {
+    SPOOR_FILTER_PRIORITY_HIGH,
+    SPOOR_FILTER_PRIORITY_MEDIUM,
+    SPOOR_FILTER_PRIORITY_LOW,
+};
+
 typedef struct SpoorFilter {
     u32 type;
     u32 status;
+    u32 priority;
 } SpoorFilter;
         
 #define SPOOR_OBJECT_TITLE_SIZE_MAX 240
@@ -241,6 +247,7 @@ typedef struct SpoorObject {
     SpoorTimeSpan created; // 48 bytes
     u8 status; // 1 byte
     u8 type; // 1 byte
+    u8 priority;
 } SpoorObject; // 500 bytes
 
 #define TASK_LIST_HAND_INDEX_DEFAULT 0xffffffff
