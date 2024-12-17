@@ -42,7 +42,7 @@ void task_list_render_func(View *view)
         char time_span_format[22];
 
         /* deadline feature */
-        x += 325;
+        x += 425;
         char time_offset_buffer[6] = { 0 };
         time_t today_sec = time(NULL);
         struct tm test = { 0 };
@@ -106,24 +106,28 @@ void task_list_render_func(View *view)
         view_render_text(view, x, y, (u8 *)time_span_format, CONFIG_COLOR_FOREGROUND);
 
         /* tracked */
-        x += 210;
+        x += 200;
         spoor_time_span_schedule_format_create(&data->spoor_objects[i].tracked,
                                                time_span_format);
         view_render_text(view, x, y, (u8 *)time_span_format, CONFIG_COLOR_FOREGROUND);
 
         /* type */
-        x += 210;
+        x += 200;
         view_render_text(view, x, y, (u8 *)SPOOR_TYPES[data->spoor_objects[i].type], CONFIG_COLOR_FOREGROUND);
 
+        x += 40;
+        char buffer_priority[4];
+        sprintf(buffer_priority, "%d", data->spoor_objects[i].priority);
+        view_render_text(view, x, y, buffer_priority, CONFIG_COLOR_FOREGROUND);
+
         /* status */
-        x += 80;
+        x += 40;
         view_render_text(view, x, y, (u8 *)SPOOR_STATUS[data->spoor_objects[i].status], CONFIG_COLOR_STATUS[data->spoor_objects[i].status]);
+
 
         y += GlobalGraphic.font.height;
     }
     
-    x += 10;
-    view_render_text(view, x, y, data->spoor_objects[i].priority, CONFIG_COLOR_FOREGROUND);
 
     x = view->x;
     y = view->y;

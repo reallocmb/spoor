@@ -134,18 +134,18 @@ enum {
 };
 
 const char SPOOR_STATUS[3][25] = {
-    "NOT STARTED",
-    "IN PROGRESS",
-    "COMPLETED"
+    "NS",
+    "IP",
+    "C"
 };
 
-const char SPOOR_TYPES[7][23] = {
+const char SPOOR_TYPES[7][5] = {
     "TASK",
-    "PROJECT",
-    "EVENT",
-    "APPOINTMENT",
+    "PROJ",
+    "EVEN",
+    "APPO",
     "GOAL",
-    "HABIT",
+    "HABI",
     "IDEA"
 };
 
@@ -238,7 +238,7 @@ typedef struct SpoorFilter {
 typedef struct SpoorObject {
     u32 id; // 4 bytes
     u32 id_parent; // 4 bytes
-    char title[SPOOR_OBJECT_TITLE_SIZE_MAX]; //  250
+    char title[SPOOR_OBJECT_TITLE_SIZE_MAX]; //  240
     SpoorTimeSpan deadline; // 48 bytes
     SpoorTimeSpan schedule; // 48 bytes
     u32 schedule_id_next; // 4 bytes
