@@ -26,7 +26,7 @@ void task_list_render_func(View *view)
     u32 i;
     for (i = 0; i < spoor_objects_count; i++)
     {
-        if (!(i + 1 >= spoor_objects_count) &&
+        if (!(i + 1 > spoor_objects_count) &&
             data->spoor_objects[i].deadline.end.year != data->spoor_objects[i + 1].deadline.end.year ||
             data->spoor_objects[i].deadline.end.mon != data->spoor_objects[i + 1].deadline.end.mon ||
             data->spoor_objects[i].deadline.end.day != data->spoor_objects[i + 1].deadline.end.day)
