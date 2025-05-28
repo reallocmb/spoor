@@ -1,0 +1,7 @@
+[
+  {
+    "directory": "s:/",
+    "command": "gcc src/spoor_main.c -Iinc -Llib -lfreetype -lUser32 -lGdi32 -o bin/spoor_main.exe",
+    "file": "src/spoor_main.c"
+  }
+]
