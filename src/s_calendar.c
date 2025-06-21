@@ -12,6 +12,8 @@ const char *DAYS_NAME[7] = {
 
 void calendar_render_func(View *view)
 {
+    font_size_set(&GlobalGraphic.font, CONFIG(FONT_DEFAULT_SIZE));
+
     CalendarData *data = (CalendarData *)view->data;
 
     /* today */

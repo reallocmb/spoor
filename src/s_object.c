@@ -71,7 +71,6 @@ void spoor_object_create(SpoorObject *spoor_object, char *arguments, SpoorObject
         memset(&spoor_object->schedule, SPOOR_TIME_DEFAULT_VALUE, sizeof(spoor_object->schedule));
 
         spoor_object->id = SPOOR_OBJECT_NO_ID;
-        spoor_object->id_parent = SPOOR_OBJECT_NO_PARENT_ID;
         spoor_object->schedule_id_next = 0;
         memset(&spoor_object->tracked, SPOOR_TIME_DEFAULT_VALUE, sizeof(spoor_object->tracked));
         memset(&spoor_object->complete, SPOOR_TIME_DEFAULT_VALUE, sizeof(spoor_object->complete));
@@ -146,6 +145,61 @@ u32 spoor_object_id_free_space(RedbasDB *db, u32 items)
     return i;
 }
 
+u32 spoor_object_id_free_space_size(RedbasDB *db, u32 items, u32 size)
+{
+    SpoorObject spoor_object;
+    u32 result_index = 0;
+    u32 size_tmp = size;
+    u32 i;
+    for (i = 0; i < items; i++)
+    {
+        redbas_db_restore_cursor_set(db, i);
+        redbas_db_restore(db, &spoor_object, sizeof(spoor_object));
+
+        if (spoor_object.id == SPOOR_OBJECT_ID_DELETED)
+        {
+            size_tmp--;
+            if (size_tmp == 0)
+            {
+                return i - (size - 1);
+            }
+        }
+        else
+        {
+            size_tmp = size;
+        }
+    }
+
+    return i;
+}
+
+void spoor_object_parent_save(SpoorObject *spoor_object)
+{
+    RedbasDB *db = redbas_db_open(".spoor/00000000.rdb", sizeof(*spoor_object));
+
+    /* remove parent from current place */
+    u32 remove_id = spoor_object->id;
+    spoor_object->id = SPOOR_OBJECT_ID_DELETED;
+    redbas_db_change(db, &spoor_object, sizeof(*spoor_object), remove_id);
+
+    /* get new place  with alloc of 10 ahead */
+    u32 id = spoor_object_id_free_space_size(db, db->items, 10);
+    spoor_object->id = id;
+    redbas_db_change(db, &spoor_boject, sizeof(*spoor_object), spoor_object->id);
+    u32 i;
+    for (i = 0; i < 9; i++)
+    {
+        redbas_db_change
+    }
+
+    redbas_db_close(db);
+}
+
+void spoor_object_child_save(SpoorObject *spoor_object)
+{
+
+}
+
 void spoor_object_save(SpoorObject *spoor_object)
 {
     RedbasDB *db = redbas_db_open(".spoor/00000000.rdb", sizeof(*spoor_object));
@@ -175,7 +229,6 @@ void spoor_object_print(SpoorObject *spoor_object)
 {
     printf("-- Spoor Object --\n");
     printf("id: %i\n", spoor_object->id);
-    printf("id_parent: %i\n", spoor_object->id_parent);
     printf("title: %s\n", spoor_object->title);
     spoor_time_span_print(&spoor_object->deadline, "deadline");
     spoor_time_span_print(&spoor_object->schedule, "schedule");

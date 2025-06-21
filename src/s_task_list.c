@@ -2,6 +2,8 @@
 
 void task_list_render_func(View *view)
 {
+    font_size_set(&GlobalGraphic.font, CONFIG(FONT_DEFAULT_SIZE));
+
     TaskListData *data = (TaskListData *)view->data;
     data->spoor_filter.flags = 0;
     data->spoor_filter.schedule.start = SPOOR_FILTER_TIME_SPAN_DEFAULT_START;
@@ -162,6 +164,15 @@ void task_list_render_func(View *view)
     render_rectangle_fill(x, y + data->index * GlobalGraphic.font.height * LINES_USE_COUNT,
                           view->width, GlobalGraphic.font.height * LINES_USE_COUNT - 1,
                           CONFIG(STATUS_BAR_COLOR_BACKGROUND));
+
+    /* highlight selection */
+    u32 s;
+    for (s = 0; s < data->selection_count; s++)
+    {
+        render_rectangle_fill(x, y + data->selection[s] * GlobalGraphic.font.height * LINES_USE_COUNT,
+                              view->width, GlobalGraphic.font.height * LINES_USE_COUNT - 1,
+                              0xff5555ff);
+    }
 
 
     y += GlobalGraphic.font.height + (GlobalGraphic.font.face->size->metrics.descender >> 6);
@@ -499,6 +510,63 @@ void task_list_input_func(View *view, u8 key)
             if (spoor_object->priority >= counter)
                 spoor_object->priority -= counter;
             spoor_object_save(spoor_object);
+        } break;
+
+        /* test projekt join thing */
+        case 'g':
+        {
+            u32 *childs_indexes = &task_list_data->selection;
+            u32 *childs_count = &task_list_data->selection_count;
+            u32 parent_index = task_list_data->index;
+
+            /* parent */
+            SpoorObject *spoor_object_parent = &global_data.spoor_objects[task_list_data->spoor_objects_indexes[parent_index]];
+            spoor_object_parent->flag &= SPOOR_OBJECT_FLAG_PARENT;
+
+            spoor_object_parent_save(spoor_object_parent);
+
+
+            /* child's */
+            SpoorObject *spoor_object_child = NULL;
+            u32 i;
+            for (i = 0; i < *childs_count; i++)
+            {
+                spoor_object_child = &global_data.spoor_objects[task_list_data->spoor_objects_indexes[childs_indexes[i]];
+                spoor_object_child_save(spoor_object_child);
+            }
+
+            SpoorObject *spoor_object_child = NULL;
+
+            /* clear selection */
+            *childs_count = 0;
+        } break;
+        case 'V':
+        {
+        } break;
+        case 'v':
+        {
+            u32 *selection = &task_list_data->selection;
+            u32 *count = &task_list_data->selection_count;
+            u32 index = task_list_data->index;
+
+            u32 i;
+            for (i = 0; i < *count; i++)
+            {
+                if (index == selection[i])
+                    break;
+            }
+
+            if (i >= *count)
+            {
+                selection[*count] = index;
+                (*count)++;
+            }
+            else
+            {
+                memcpy(selection + i, selection + i + 1, ((*count - 1) - i) * sizeof(*selection));
+                (*count)--;
+            }
+
         } break;
     }
 }

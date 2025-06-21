@@ -12,6 +12,12 @@ void font_size_set(SpoorFont *font, u32 size)
     u32 i;
     for (i = 0; i < global_ttf_cache_sizes_count; i++)
     {
+        if (size == global_ttf_cache_sizes[i].font_size)
+        {
+            global_ttf_cache_data = global_ttf_cache_sizes[i].ttf_cache_data;
+            return;
+        }
+
         if (size < global_ttf_cache_sizes[i].font_size)
             break;
     }

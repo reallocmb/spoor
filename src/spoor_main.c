@@ -1,5 +1,4 @@
 #include"spoor.h"
-#include"s_redbas.c"
 #include"s_time.c"
 #include"s_sort.c"
 #include"s_object.c"
@@ -62,12 +61,12 @@ void input_func(u8 key)
 
             case 'I':
             {
-                font_size_set(&GlobalGraphic.font, GlobalGraphic.font.size + 1);
+                CONFIG_SET(FONT_DEFAULT_SIZE, GlobalGraphic.font.size + 1);
             } break;
 
             case 'i':
             {
-                font_size_set(&GlobalGraphic.font, GlobalGraphic.font.size - 1);
+                CONFIG_SET(FONT_DEFAULT_SIZE, GlobalGraphic.font.size - 1);
             } break;
 
             default:
@@ -89,6 +88,7 @@ void input_func(u8 key)
                 ((TaskListData *)GlobalGraphic.views[GlobalGraphic.views_index].data)->spoor_filter.type = SPOOR_FILTER_TYPE_TASK | SPOOR_FILTER_TYPE_APPOINTMENT | SPOOR_FILTER_TYPE_EVENT | SPOOR_FILTER_TYPE_HABIT | SPOOR_FILTER_TYPE_PROJECT;
                 ((TaskListData *)GlobalGraphic.views[GlobalGraphic.views_index].data)->spoor_filter.status = SPOOR_FILTER_STATUS_NOT_STARTED | SPOOR_FILTER_STATUS_IN_PROGRESS;
                 ((TaskListData *)GlobalGraphic.views[GlobalGraphic.views_index].data)->spoor_objects_indexes_count = 0;
+                ((TaskListData *)GlobalGraphic.views[GlobalGraphic.views_index].data)->selection_count = 0;
                 ((TaskListData *)GlobalGraphic.views[GlobalGraphic.views_index].data)->sort_func = sort_default_func;
 
                 GlobalGraphic.views[GlobalGraphic.views_index].render_func = task_list_render_func;
@@ -221,6 +221,7 @@ int main(void)
     ((TaskListData *)GlobalGraphic.views[GlobalGraphic.views_index].data)->spoor_filter.status = SPOOR_FILTER_STATUS_NOT_STARTED | SPOOR_FILTER_STATUS_IN_PROGRESS;
     ((TaskListData *)GlobalGraphic.views[GlobalGraphic.views_index].data)->spoor_objects_indexes_count = 0;
     ((TaskListData *)GlobalGraphic.views[GlobalGraphic.views_index].data)->sort_func = sort_default_func;
+    ((TaskListData *)GlobalGraphic.views[GlobalGraphic.views_index].data)->selection_count = 0;
     ((TaskListData *)GlobalGraphic.views[GlobalGraphic.views_index].data)->offset_y = 0;
 
     GlobalGraphic.views[GlobalGraphic.views_index].render_func = task_list_render_func;

@@ -1,6 +1,8 @@
 #ifndef SPOOR_H
 #define SPOOR_H
 
+#include"s_redbas.c"
+
 #include"s_types.h"
 #include"s_config2_0.h"
 //#include"s_config.h"
@@ -295,9 +297,16 @@ typedef struct SpoorSort {
 #define SPOOR_OBJECT_NO_ID 0xffffffff
 #define SPOOR_OBJECT_FREE_ID 0xfffffffe
 
+#define SPOOR_OBJECT_FLAG_DEFAULT (1 << 0);
+#define SPOOR_OBJECT_FLAG_PARENT (1 << 1);
+#define SPOOR_OBJECT_FLAG_CHILD (1 << 2);
+
+#define SPOOR_OBJECT_CHILDS_ALLOC_SIZE 10
+
 typedef struct SpoorObject {
     u32 id; // 4 bytes
-    u32 id_parent; // 4 bytes
+    u16 flag;
+    u16 childs_count; /* new byte */
     char title[SPOOR_OBJECT_TITLE_SIZE_MAX]; //  240
     SpoorTimeSpan deadline; // 48 bytes
     SpoorTimeSpan schedule; // 48 bytes
@@ -345,6 +354,8 @@ typedef struct TaskListData {
     u32 spoor_objects_indexes_count;
     u32 index;
     s32 (*sort_func)(const void *data0, const void *data1);
+    u32 selection[50];
+    u32 selection_count;
     SpoorFilter spoor_filter;
     u32 index_last;
     s32 offset_y;
@@ -353,6 +364,7 @@ typedef struct TaskListData {
 #define DAY_SECONDS 86400
 
 const u32 CALENDAR_OBJECT_COLORS[7] = {
+#if 1
     0x95c3a083, // SPOOR_TYPE_TASK,
     0x95d39083,// SPOOR_TYPE_PROJECT,
     0x95d3b063,// SPOOR_TYPE_EVENT,
@@ -360,6 +372,15 @@ const u32 CALENDAR_OBJECT_COLORS[7] = {
     0x95c3b073,// SPOOR_TYPE_GOAL,
     0x95b3b083,// SPOOR_TYPE_HABIT,
     0x9583a0c3,// SPOOR_TYPE_IDEA,
+#else
+    0xf0c3a083, // SPOOR_TYPE_TASK,
+    0xf0d39083,// SPOOR_TYPE_PROJECT,
+    0xf0d3b063,// SPOOR_TYPE_EVENT,
+    0xf0d3a073,// SPOOR_TYPE_APPOINTMENT,
+    0xf0c3b073,// SPOOR_TYPE_GOAL,
+    0xf0b3b083,// SPOOR_TYPE_HABIT,
+    0xf083a0c3,// SPOOR_TYPE_IDEA,
+#endif
 };
 
 typedef struct CalendarData {
